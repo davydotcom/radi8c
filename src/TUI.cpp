@@ -95,6 +95,17 @@ std::string TUI::get_first_active_channel() const {
     return "";
 }
 
+std::vector<std::string> TUI::get_joined_channels() const {
+    std::vector<std::string> joined;
+    for (const auto& [name, ch] : channels) {
+        // Only include actual joined channels, not DMs
+        if (ch.joined && !ch.is_dm) {
+            joined.push_back(name);
+        }
+    }
+    return joined;
+}
+
 void TUI::set_active_channel(const std::string& name) {
     if (channels.find(name) != channels.end()) {
         active_channel = name;
@@ -778,33 +789,38 @@ void TUI::render() {
 
 bool TUI::show_login_dialog(std::string& host, int& port, bool& use_ssl,
                             std::string& username, std::string& password) {
-    // Initialize with defaults
-    host = "localhost";
-    port = 1337;
-    use_ssl = false;
-    username = "";
-    password = "";
+    std::string port_str = std::to_string(port);
+    int ssl_selected = use_ssl ? 0 : 1;
+    std::vector<std::string> ssl_options = {"Yes", "No"};
     
-    std::string port_str = "1337";
-    std::string ssl_str = "n";
-    
-    int selected = 0;
     bool submitted = false;
     bool cancelled = false;
     
-    auto host_input = Input(&host, "localhost");
-    auto port_input = Input(&port_str, "1337");
-    auto ssl_input = Input(&ssl_str, "n");
-    auto user_input = Input(&username, "");
+    // Create single-line inputs
+    InputOption host_option;
+    host_option.multiline = false;
+    auto host_input = Input(&host, "localhost", host_option);
+    
+    InputOption port_option;
+    port_option.multiline = false;
+    auto port_input = Input(&port_str, "1337", port_option);
+    
+    // SSL dropdown
+    auto ssl_dropdown = Radiobox(&ssl_options, &ssl_selected);
+    
+    InputOption user_option;
+    user_option.multiline = false;
+    auto user_input = Input(&username, "", user_option);
     
     InputOption password_option;
     password_option.password = true;
+    password_option.multiline = false;
     auto pass_input = Input(&password, "", password_option);
     
     auto container = Container::Vertical({
         host_input,
         port_input,
-        ssl_input,
+        ssl_dropdown,
         user_input,
         pass_input,
     });
@@ -815,7 +831,7 @@ bool TUI::show_login_dialog(std::string& host, int& port, bool& use_ssl,
             separator(),
             hbox({text("Host:     "), host_input->Render() | flex}),
             hbox({text("Port:     "), port_input->Render() | flex}),
-            hbox({text("SSL (y/n):"), ssl_input->Render() | flex}),
+            hbox({text("SSL:      "), ssl_dropdown->Render()}),
             hbox({text("Username: "), user_input->Render() | flex}),
             hbox({text("Password: "), pass_input->Render() | flex}),
             separator(),
@@ -852,7 +868,7 @@ bool TUI::show_login_dialog(std::string& host, int& port, bool& use_ssl,
         } catch (...) {
             port = 1337;
         }
-        use_ssl = (ssl_str == "y" || ssl_str == "Y" || ssl_str == "yes");
+        use_ssl = (ssl_selected == 0); // 0 = Yes, 1 = No
         return true;
     }
     

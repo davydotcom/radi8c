@@ -19,6 +19,7 @@ set(SOURCES
     src/Protocol.cpp
     src/TUI.cpp
     src/FileTransfer.cpp
+    src/Config.cpp
     src/main.cpp
 )
 

@@ -97,6 +97,7 @@ public:
         auto it = channels.find(active_channel);
         return it != channels.end() && it->second.is_dm;
     }
+    std::vector<std::string> get_joined_channels() const;
     
     void set_input_callback(std::function<void(const std::string&)> callback) {
         on_input_callback = callback;

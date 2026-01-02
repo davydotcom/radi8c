@@ -1,6 +1,7 @@
 #include "TUI.h"
 #include "Connection.h"
 #include "Protocol.h"
+#include "Config.h"
 #include <iostream>
 #include <fstream>
 #include <thread>
@@ -103,6 +104,10 @@ int main(int, char**) {
     
     TUI tui;
     Connection conn;
+    Config config;
+    
+    // Load saved configuration
+    config.load();
     
     try {
         tui.init();
@@ -119,6 +124,14 @@ int main(int, char**) {
             Protocol* proto = nullptr;
             std::thread* recv_thread = nullptr;
             std::atomic<bool> connection_lost(false);
+            
+            // Initialize with saved config values
+            ConnectionConfig last_conn = config.get_last_connection();
+            host = last_conn.host;
+            port = last_conn.port;
+            use_ssl = last_conn.use_ssl;
+            username = last_conn.username;
+            password = "";
             
             while (!authenticated) {
             if (!tui.show_login_dialog(host, port, use_ssl, username, password)) {
@@ -202,6 +215,10 @@ int main(int, char**) {
             authenticated = true;
         }
         
+        // Save successful connection settings (excluding password)
+        config.set_last_connection(host, port, use_ssl, username);
+        config.save();
+        
         // Wire join request callback (channel join or DM start)
         tui.set_join_request_callback([&](const std::string& name, const std::string& password, bool is_dm) {
             if (is_dm) {
@@ -230,6 +247,15 @@ int main(int, char**) {
         
         // Request channel list
         proto->request_channel_list();
+        
+        // Auto-rejoin previously joined channels for this host
+        std::vector<std::string> prev_channels = config.get_joined_channels(host);
+        if (!prev_channels.empty()) {
+            tui.set_status("Rejoining previous channels...");
+            for (const auto& channel : prev_channels) {
+                proto->join_channel(channel, "");
+            }
+        }
         
         // Set up input callback
         bool user_requested_disconnect = false;
@@ -461,6 +487,11 @@ int main(int, char**) {
         
             // Run FTXUI event loop
             tui.run();
+            
+            // Save joined channels before disconnect
+            std::vector<std::string> joined_channels = tui.get_joined_channels();
+            config.set_joined_channels(host, joined_channels);
+            config.save();
             
             // Cleanup threads — disconnect first to wake any blocking reads
             running = false;
