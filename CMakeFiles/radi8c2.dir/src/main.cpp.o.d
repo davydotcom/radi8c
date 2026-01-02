@@ -900,6 +900,7 @@ CMakeFiles/radi8c2.dir/src/main.cpp.o: \
   /opt/homebrew/Cellar/openssl@3/3.6.0/include/openssl/err.h \
   /Users/davydotcom/projects/C++/radi8c2/include/Protocol.h \
   /Users/davydotcom/projects/C++/radi8c2/include/FileTransfer.h \
+  /Users/davydotcom/projects/C++/radi8c2/include/Config.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/iostream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/fstream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__filesystem/path.h \

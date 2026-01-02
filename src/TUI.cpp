@@ -4,6 +4,11 @@
 #include "ftxui/dom/elements.hpp"
 #include <algorithm>
 #include <sstream>
+#include <climits>
+#include <cstdio>
+#include <unistd.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 using namespace ftxui;
 
@@ -17,6 +22,27 @@ TUI::~TUI() {
 void TUI::init() {
     main_component = build_ui();
 }
+
+void TUI::open_file(const std::string& path) {
+#if defined(__APPLE__) || defined(__MACH__)
+    std::string cmd = std::string("open ") + '"' + path + '"';
+#else
+    std::string cmd = std::string("xdg-open ") + '"' + path + '"';
+#endif
+    // Fire and forget
+    std::system(cmd.c_str());
+}
+
+void TUI::open_download_path(const std::string& path) {
+    open_file(path);
+}
+
+void TUI::open_last_download() {
+    if (!last_download_path.empty()) {
+        open_file(last_download_path);
+    }
+}
+
 
 void TUI::cleanup() {
     // FTXUI handles cleanup automatically
@@ -116,19 +142,26 @@ void TUI::set_active_channel(const std::string& name) {
     refresh_conversations();
 }
 
-void TUI::add_message(const ChatMessage& msg) {
-    if (channels.find(msg.channel) != channels.end()) {
-        channels[msg.channel].messages.push_back(msg);
-        
-        if (msg.channel != active_channel) {
-            channels[msg.channel].unread_count++;
-        } else {
-            // Autoscroll to bottom for active channel
-            chat_scroll_y = 1.0f;
-        }
-        // Update list to reflect unread badges
-        refresh_conversations();
+void TUI::add_message(const ChatMessage& incoming) {
+    auto itc = channels.find(incoming.channel);
+    if (itc == channels.end()) return;
+
+    ChatMessage msg = incoming;
+    msg.id = next_msg_id++;
+    msg.raw_message = incoming.message;
+    // Redact private regions for display by default
+    bool has_priv = false;
+    msg.message = redact_private(incoming.message, &has_priv);
+    msg.has_private = has_priv;
+
+    itc->second.messages.push_back(msg);
+
+    if (msg.channel != active_channel) {
+        itc->second.unread_count++;
+    } else {
+        chat_scroll_y = 1.0f;
     }
+    refresh_conversations();
 }
 
 void TUI::add_user_to_channel(const std::string& channel, const std::string& username) {
@@ -316,6 +349,52 @@ Element TUI::format_text_with_urls(const std::string& line) {
     return hbox(segments);
 }
 
+std::string TUI::redact_private(const std::string& in, bool* has_private) {
+    if (has_private) *has_private = false;
+    std::string out;
+    size_t pos = 0;
+    while (true) {
+        size_t start = in.find("<private>", pos);
+        if (start == std::string::npos) {
+            out += in.substr(pos);
+            break;
+        }
+        if (has_private) *has_private = true;
+        out += in.substr(pos, start - pos);
+        size_t end = in.find("</private>", start + 9);
+        if (end == std::string::npos) { // malformed, append rest
+            out += in.substr(start);
+            break;
+        }
+        size_t len = end - (start + 9);
+        out += std::string(len, '*');
+        pos = end + 10; // skip closing tag
+    }
+    return out;
+}
+
+std::string TUI::untag_private(const std::string& in) {
+    std::string out;
+    size_t pos = 0;
+    while (true) {
+        size_t start = in.find("<private>", pos);
+        if (start == std::string::npos) {
+            out += in.substr(pos);
+            break;
+        }
+        out += in.substr(pos, start - pos);
+        size_t end = in.find("</private>", start + 9);
+        if (end == std::string::npos) {
+            out += in.substr(start);
+            break;
+        }
+        // append inner content only
+        out += in.substr(start + 9, end - (start + 9));
+        pos = end + 10;
+    }
+    return out;
+}
+
 std::vector<std::string> TUI::wrap_text(const std::string& text, int max_width) {
     std::vector<std::string> lines;
     if (max_width <= 0) max_width = 80; // fallback
@@ -345,13 +424,33 @@ Element TUI::format_message(const ChatMessage& msg) {
     // Estimate available width: typical terminal is ~80-120 cols, minus left panel (24), right panel (22), borders
     // Let's use a safe estimate of 60 characters for message content
     const int message_width = 80;
+
+    // Ensure message_controls exists
+    if (!message_controls) message_controls = Container::Horizontal({});
     
     if (msg.is_system) {
         std::string sys_text = "[" + msg.username + "] " + msg.message;
         auto wrapped = wrap_text(sys_text, message_width);
         Elements lines;
-        for (const auto& line : wrapped) {
-            lines.push_back(text(line) | color(Color::Red));
+        
+        // If this system message has an open_path, make the wrapped lines clickable
+        if (!msg.open_path.empty()) {
+            ButtonOption opt = ButtonOption::Simple();
+            opt.transform = [](const EntryState& s){
+                auto e = text(s.label) | underlined | color(Color::Cyan);
+                if (s.focused) e = e | bold;
+                return e;
+            };
+            
+            for (const auto& line : wrapped) {
+                auto btn = Button(line, [this, &msg](){ open_file(msg.open_path); }, opt);
+                if (message_controls) message_controls->Add(btn);
+                lines.push_back(btn->Render());
+            }
+        } else {
+            for (const auto& line : wrapped) {
+                lines.push_back(text(line) | color(Color::Red));
+            }
         }
         return vbox(lines);
     } else if (msg.is_emote) {
@@ -363,18 +462,105 @@ Element TUI::format_message(const ChatMessage& msg) {
         }
         return vbox(lines);
     } else {
-        // Normal message with timestamp, username, and wrapped content
+        // Normal message with timestamp, username, and content possibly containing <private>…</private>
+        bool is_own_message = (msg.username == current_username);
         std::string prefix = msg.timestamp + " " + msg.username + ": ";
-        std::string full_text = prefix + msg.message;
+
+        // If not revealed yet, msg.message already has private blocks redacted.
+        // If revealed, use raw_message for this message id.
+        bool revealed = (msg.has_private && revealed_private_ids.count(msg.id) > 0);
+        std::string content = revealed ? untag_private(msg.raw_message) : msg.message;
+
+        // If not revealed and has private, render buttons in place of masked regions
+        Elements lines;
+        if (msg.has_private && !revealed) {
+            // Split by <private>…</private>
+            size_t pos = 0;
+            size_t start = 0;
+            Elements row_segments;
+            auto flush_text = [&](const std::string& s){ if(!s.empty()) row_segments.push_back(text(s)); };
+            // We render a single line using paragraph for wrapping later
+            while ((start = msg.raw_message.find("<private>", pos)) != std::string::npos) {
+                std::string before = msg.raw_message.substr(pos, start - pos);
+                size_t endtag = msg.raw_message.find("</private>", start + 9);
+                if (endtag == std::string::npos) break; // malformed; bail
+                std::string hidden = msg.raw_message.substr(start + 9, endtag - (start + 9));
+                flush_text(before);
+                std::string mask(hidden.size(), '*');
+                // Create a button to reveal this message's private content (toggle all of them)
+                ButtonOption opt = ButtonOption::Simple();
+                opt.transform = [](const EntryState& s){ auto e = text(s.label) | underlined; if (s.focused) e = e | inverted; return e; };
+                auto btn = Button(mask, [this, &msg]() {
+                    // Toggle reveal for this message id
+                    if (revealed_private_ids.count(msg.id)) revealed_private_ids.erase(msg.id); else revealed_private_ids.insert(msg.id);
+                    render();
+                }, opt);
+                if (message_controls) message_controls->Add(btn);
+                row_segments.push_back(btn->Render());
+                pos = endtag + 10; // len("</private>") == 10
+            }
+            // Append remaining tail
+            if (pos < msg.raw_message.size()) {
+                flush_text(msg.raw_message.substr(pos));
+            }
+
+            // Build a paragraph with prefix + segments
+            Elements prefix_el{ text(prefix) };
+            auto line_el = hbox(prefix_el) | nothing;
+            // Join segments after prefix
+            row_segments.insert(row_segments.begin(), text(""));
+            lines.push_back(hbox({ text(prefix), hbox(row_segments) }));
+            return vbox(lines);
+        }
+
+        // Else: simple wrapped text for either revealed or non-private
+        std::string full_text = prefix + content;
         auto wrapped = wrap_text(full_text, message_width);
         
-        Elements lines;
-        for (const auto& line : wrapped) {
-            // Check if this line contains a URL and format accordingly
-            if (contains_url(line)) {
-                lines.push_back(format_text_with_urls(line));
-            } else {
-                lines.push_back(text(line));
+        if (!msg.open_path.empty()) {
+            // Make the wrapped lines clickable
+            ButtonOption opt = ButtonOption::Simple();
+            opt.transform = [](const EntryState& s){
+                auto e = text(s.label) | underlined | color(Color::Cyan);
+                if (s.focused) e = e | bold;
+                return e;
+            };
+            
+            for (const auto& line : wrapped) {
+                auto btn = Button(line, [this, &msg](){ open_file(msg.open_path); }, opt);
+                if (message_controls) message_controls->Add(btn);
+                lines.push_back(btn->Render());
+            }
+        } else {
+            // For each wrapped line, check if it contains the username and colorize it
+            for (size_t i = 0; i < wrapped.size(); ++i) {
+                const auto& line = wrapped[i];
+                
+                // First line contains timestamp and username
+                if (i == 0 && is_own_message) {
+                    // Split line into parts: timestamp, username, and rest
+                    size_t username_start = msg.timestamp.length() + 1; // +1 for space
+                    size_t username_end = username_start + msg.username.length();
+                    
+                    if (line.length() > username_end) {
+                        std::string timestamp_part = line.substr(0, username_start);
+                        std::string username_part = line.substr(username_start, msg.username.length());
+                        std::string rest_part = line.substr(username_end);
+                        
+                        auto elem = hbox({
+                            text(timestamp_part),
+                            text(username_part) | color(Color::Green),
+                            text(rest_part)
+                        });
+                        lines.push_back(elem);
+                    } else {
+                        if (contains_url(line)) lines.push_back(format_text_with_urls(line));
+                        else lines.push_back(text(line));
+                    }
+                } else {
+                    if (contains_url(line)) lines.push_back(format_text_with_urls(line));
+                    else lines.push_back(text(line));
+                }
             }
         }
         return vbox(lines);
@@ -426,12 +612,11 @@ void TUI::refresh_conversations() {
     Components dm_buttons_local;
     Components browse_buttons;
 
-    int idx = 1;
     // Joined channels buttons
     for (const auto& name : joined_channels) {
         const auto& ch = channels[name];
         int unread = ch.unread_count;
-        std::string label = "[" + std::to_string(idx++) + "] #" + name + (unread>0? (" ("+std::to_string(unread)+")") : "");
+        std::string label = "#" + name + (unread>0? (" ("+std::to_string(unread)+")") : "");
         ButtonOption opt = ButtonOption::Simple();
         opt.transform = [this, name](const EntryState& s) {
             auto elem = text(s.label);
@@ -446,7 +631,7 @@ void TUI::refresh_conversations() {
     for (const auto& name : dm_list) {
         const auto& ch = channels[name];
         int unread = ch.unread_count;
-        std::string label = "[" + std::to_string(idx++) + "] @" + name + (unread>0? (" ("+std::to_string(unread)+")") : "");
+        std::string label = "@" + name + (unread>0? (" ("+std::to_string(unread)+")") : "");
         ButtonOption opt = ButtonOption::Simple();
         opt.transform = [this, name](const EntryState& s) {
             auto elem = hbox({ text("│ ") | dim, text(s.label) });
@@ -461,7 +646,7 @@ void TUI::refresh_conversations() {
     for (const auto& name : unjoined_channels) {
         const auto& ch = channels[name];
         int unread = ch.unread_count;
-        std::string label = "[" + std::to_string(idx++) + "] #" + name + (unread>0? (" ("+std::to_string(unread)+")") : "");
+        std::string label = "#" + name + (unread>0? (" ("+std::to_string(unread)+")") : "");
         ButtonOption opt = ButtonOption::Simple();
         opt.transform = [](const EntryState& s) {
             auto elem = text(s.label) | dim;
@@ -560,7 +745,9 @@ Element TUI::render_user_list() {
     if (!active_channel.empty() && channels.find(active_channel) != channels.end()) {
         Channel& ch = channels[active_channel];
         for (const auto& user : ch.users) {
-            auto elem = text(user) | color(get_color_for_user(user));
+            bool is_current_user = (user == current_username);
+            std::string display_name = user + (is_current_user ? " *" : "");
+            auto elem = text(display_name) | color(get_color_for_user(user));
             user_elements.push_back(elem);
         }
     }
@@ -594,12 +781,14 @@ Component TUI::build_ui() {
     // Build join modal component
     join_modal_component = build_join_modal();
     auto maybe_modal = Maybe(join_modal_component, &show_join_modal);
-    
+
     // Container with all components (include modal so it can receive focus)
+    message_controls = Container::Horizontal({});
     auto container = Container::Horizontal({
         channel_list,
         input_component,
         maybe_modal,
+        message_controls,
     });
     
     // Give initial focus to the input box
@@ -607,14 +796,16 @@ Component TUI::build_ui() {
 
     // Main renderer
     auto renderer = Renderer(container, [this, channel_list]() {
+        // Reset message control widgets for this frame
+        if (message_controls) message_controls->DetachAllChildren();
+
         auto left = channel_list->Render() | size(WIDTH, EQUAL, 24);
         auto center_inner = render_chat_area();
         auto center = center_inner | vscroll_indicator | focusPositionRelative(0.0f, chat_scroll_y) | frame | reflect(chat_box) | border | flex;
         auto right = render_user_list() | size(WIDTH, EQUAL, 22);
         
-        auto status = hbox({
-            text(status_text) | inverted | flex,
-        });
+        // Build status row
+        auto status = hbox({ text(status_text) | inverted | flex });
         
         // Visual preview: wrapped paragraph of the input content.
         auto input_visual = hbox({
@@ -736,11 +927,32 @@ Component TUI::build_ui() {
         if (event == Event::ArrowUp || event == Event::ArrowDown) {
             if (channels.empty()) return false;
             
-            // Build a list of channel names
-            std::vector<std::string> channel_list;
-            for (const auto& pair : channels) {
-                channel_list.push_back(pair.first);
+            // Build channel list in visual order: joined channels, DMs, browse/unjoined
+            std::vector<std::string> joined_channels;
+            std::vector<std::string> dm_list;
+            std::vector<std::string> unjoined_channels;
+            
+            for (const auto& kv : channels) {
+                const auto& ch = kv.second;
+                if (ch.is_dm) {
+                    dm_list.push_back(kv.first);
+                } else if (ch.joined) {
+                    joined_channels.push_back(kv.first);
+                } else {
+                    unjoined_channels.push_back(kv.first);
+                }
             }
+            
+            auto by_name = [](const std::string& a, const std::string& b){ return a < b; };
+            std::sort(joined_channels.begin(), joined_channels.end(), by_name);
+            std::sort(dm_list.begin(), dm_list.end(), by_name);
+            std::sort(unjoined_channels.begin(), unjoined_channels.end(), by_name);
+            
+            // Build final ordered list
+            std::vector<std::string> channel_list;
+            channel_list.insert(channel_list.end(), joined_channels.begin(), joined_channels.end());
+            channel_list.insert(channel_list.end(), dm_list.begin(), dm_list.end());
+            channel_list.insert(channel_list.end(), unjoined_channels.begin(), unjoined_channels.end());
             
             // Find current channel index
             int current_index = 0;
@@ -907,4 +1119,146 @@ void TUI::show_error(const std::string& error) {
     });
     
     screen.Loop(with_exit);
+}
+
+void TUI::refresh_file_picker_entries() {
+    file_picker_entries.clear();
+    file_picker_selected_index = 0;
+    
+    // Always add parent directory option
+    file_picker_entries.push_back("..");
+    
+    DIR* dir = opendir(file_picker_path.c_str());
+    if (!dir) return;
+    
+    std::vector<std::string> directories;
+    std::vector<std::string> files;
+    
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != nullptr) {
+        std::string name = entry->d_name;
+        if (name == "." || name == "..") continue;
+        
+        std::string full_path = file_picker_path + "/" + name;
+        struct stat st;
+        if (stat(full_path.c_str(), &st) == 0) {
+            if (S_ISDIR(st.st_mode)) {
+                directories.push_back(name + "/");
+            } else if (S_ISREG(st.st_mode)) {
+                files.push_back(name);
+            }
+        }
+    }
+    closedir(dir);
+    
+    // Sort and add directories first, then files
+    std::sort(directories.begin(), directories.end());
+    std::sort(files.begin(), files.end());
+    
+    for (const auto& d : directories) {
+        file_picker_entries.push_back(d);
+    }
+    for (const auto& f : files) {
+        file_picker_entries.push_back(f);
+    }
+}
+
+Component TUI::build_file_picker_modal() {
+    // Create a menu for file selection
+    auto menu_container = Container::Vertical({});
+    
+    return Renderer(menu_container, [this]() {
+        Elements entries_display;
+        for (size_t i = 0; i < file_picker_entries.size(); ++i) {
+            auto entry_text = text(file_picker_entries[i]);
+            if (i == file_picker_selected_index) {
+                entry_text = entry_text | inverted | bold;
+            }
+            entries_display.push_back(entry_text);
+        }
+        
+        auto title = text("Select File: " + file_picker_path) | bold | center;
+        auto file_list = vbox(entries_display) | vscroll_indicator | frame | flex;
+        auto help_text = text("↑/↓: Navigate | Enter: Select | Esc: Cancel") | dim | center;
+        
+        return vbox({
+            title,
+            separator(),
+            file_list,
+            separator(),
+            help_text,
+        }) | border | size(WIDTH, EQUAL, 80) | size(HEIGHT, EQUAL, 30) | center;
+    });
+}
+
+std::string TUI::pick_file() {
+    // Initialize file picker with current directory
+    char cwd_buffer[PATH_MAX];
+    if (getcwd(cwd_buffer, sizeof(cwd_buffer)) != nullptr) {
+        file_picker_path = cwd_buffer;
+    } else {
+        file_picker_path = "/";
+    }
+    
+    refresh_file_picker_entries();
+    file_picker_selected_file.clear();
+    show_file_picker_modal = true;
+    
+    file_picker_modal_component = build_file_picker_modal();
+    
+    auto component = CatchEvent(file_picker_modal_component, [this](Event event) {
+        if (event == Event::Escape) {
+            show_file_picker_modal = false;
+            screen.Exit();
+            return true;
+        }
+        
+        if (event == Event::ArrowUp) {
+            if (file_picker_selected_index > 0) {
+                file_picker_selected_index--;
+            }
+            return true;
+        }
+        
+        if (event == Event::ArrowDown) {
+            if (file_picker_selected_index < static_cast<int>(file_picker_entries.size()) - 1) {
+                file_picker_selected_index++;
+            }
+            return true;
+        }
+        
+        if (event == Event::Return) {
+            if (file_picker_selected_index >= 0 && 
+                file_picker_selected_index < static_cast<int>(file_picker_entries.size())) {
+                std::string selected = file_picker_entries[file_picker_selected_index];
+                
+                if (selected == "..") {
+                    // Go to parent directory
+                    size_t last_slash = file_picker_path.find_last_of('/');
+                    if (last_slash != std::string::npos && last_slash > 0) {
+                        file_picker_path = file_picker_path.substr(0, last_slash);
+                    } else {
+                        file_picker_path = "/";
+                    }
+                    refresh_file_picker_entries();
+                } else if (selected.back() == '/') {
+                    // Enter directory
+                    file_picker_path += "/" + selected.substr(0, selected.length() - 1);
+                    refresh_file_picker_entries();
+                } else {
+                    // Selected a file
+                    file_picker_selected_file = file_picker_path + "/" + selected;
+                    show_file_picker_modal = false;
+                    screen.Exit();
+                }
+            }
+            return true;
+        }
+        
+        return false;
+    });
+    
+    screen.Loop(component);
+    
+    return file_picker_selected_file;
 }

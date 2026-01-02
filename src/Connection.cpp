@@ -123,24 +123,10 @@ bool Connection::send_message(const std::string& message) {
     std::string msg = message + "\n";
     int bytes_sent;
     
-    // DEBUG: Log SSL sends
-    if (use_ssl && message.find("!name") == 0) {
-        std::ofstream debug("/tmp/radi8_ssl_debug.log", std::ios::app);
-        debug << "[SSL SEND] " << message << " (" << msg.length() << " bytes)" << std::endl;
-        debug.close();
-    }
-    
     if (use_ssl && ssl) {
         bytes_sent = SSL_write(ssl, msg.c_str(), msg.length());
     } else {
         bytes_sent = write(sockfd, msg.c_str(), msg.length());
-    }
-    
-    // DEBUG: Log result
-    if (use_ssl && message.find("!name") == 0) {
-        std::ofstream debug("/tmp/radi8_ssl_debug.log", std::ios::app);
-        debug << "[SSL SEND RESULT] bytes_sent=" << bytes_sent << std::endl;
-        debug.close();
     }
     
     return bytes_sent > 0;
@@ -151,36 +137,14 @@ std::string Connection::receive_message(int timeout_ms) {
         return "";
     }
     
-    // DEBUG: Log receive attempt
-    if (use_ssl) {
-        std::ofstream debug("/tmp/radi8_ssl_debug.log", std::ios::app);
-        debug << "[SSL_READ ATTEMPT] timeout_ms=" << timeout_ms << std::endl;
-        debug.close();
-    }
-    
     char buffer[131072];  // 128KB to match server buffer size
     int bytes_received;
     
     if (use_ssl && ssl) {
-        // DEBUG: Log before SSL_read
-        std::ofstream debug_before("/tmp/radi8_ssl_debug.log", std::ios::app);
-        debug_before << "[BEFORE SSL_READ] about to call SSL_read" << std::endl;
-        debug_before.flush();
-        debug_before.close();
-        
         bytes_received = SSL_read(ssl, buffer, sizeof(buffer) - 1);
         
-        // DEBUG: Log all SSL reads
-        std::ofstream debug_read("/tmp/radi8_ssl_debug.log", std::ios::app);
-        debug_read << "[SSL READ] bytes_received=" << bytes_received << std::endl;
-        debug_read.close();
-        
-        // DEBUG: Log SSL read errors
         if (bytes_received <= 0) {
             int ssl_err = SSL_get_error(ssl, bytes_received);
-            std::ofstream debug("/tmp/radi8_ssl_debug.log", std::ios::app);
-            debug << "[SSL READ ERROR] bytes_received=" << bytes_received << " SSL_get_error=" << ssl_err << std::endl;
-            debug.close();
             
             // Check if it's a real error or just no data available
             if (ssl_err == SSL_ERROR_WANT_READ || ssl_err == SSL_ERROR_WANT_WRITE) {
@@ -212,13 +176,6 @@ std::string Connection::receive_message(int timeout_ms) {
     
     buffer[bytes_received] = '\0';
     std::string result(buffer);
-    
-    // DEBUG: Log SSL receives
-    if (use_ssl && !result.empty()) {
-        std::ofstream debug("/tmp/radi8_ssl_debug.log", std::ios::app);
-        debug << "[SSL RECV] " << bytes_received << " bytes: " << result.substr(0, 200) << std::endl;
-        debug.close();
-    }
     
     return result;
 }

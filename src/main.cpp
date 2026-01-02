@@ -28,16 +28,7 @@ void signal_handler(int) {
 }
 
 void receive_thread(Connection* conn, Protocol* proto, TUI* tui, std::atomic<bool>* connection_lost) {
-    // DEBUG: Log thread start
-    std::ofstream debug("/tmp/radi8_ssl_debug.log", std::ios::app);
-    debug << "[RECV THREAD] Started" << std::endl;
-    debug.close();
-    
     while (running && conn->is_connected()) {
-        // DEBUG: Log loop iteration
-        std::ofstream debug2("/tmp/radi8_ssl_debug.log", std::ios::app);
-        debug2 << "[RECV THREAD] Loop: running=" << running << " connected=" << conn->is_connected() << std::endl;
-        debug2.close();
         
         // Check connection before attempting receive to avoid issues during disconnect
         if (!conn->is_connected()) {
@@ -45,11 +36,6 @@ void receive_thread(Connection* conn, Protocol* proto, TUI* tui, std::atomic<boo
         }
         
         std::string message = conn->receive_message(100);
-        
-        // DEBUG: Log after receive
-        std::ofstream debug3("/tmp/radi8_ssl_debug.log", std::ios::app);
-        debug3 << "[RECV THREAD] After receive: empty=" << message.empty() << " still_connected=" << conn->is_connected() << std::endl;
-        debug3.close();
         
         if (!message.empty()) {
             // Process each line separately
@@ -94,11 +80,6 @@ void receive_thread(Connection* conn, Protocol* proto, TUI* tui, std::atomic<boo
 }
 
 int main(int, char**) {
-    // DEBUG: Test log at startup
-    std::ofstream startup_test("/tmp/radi8_ssl_debug.log", std::ios::app);
-    startup_test << "[MAIN] Program started" << std::endl;
-    startup_test.close();
-    
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
     
@@ -153,17 +134,7 @@ int main(int, char**) {
             proto->clear_auth_error();
             proto->clear_auth_approved();
             
-            // DEBUG: Log before thread creation
-            std::ofstream pre_thread("/tmp/radi8_ssl_debug.log", std::ios::app);
-            pre_thread << "[MAIN] Creating receive thread" << std::endl;
-            pre_thread.close();
-            
             recv_thread = new std::thread(receive_thread, &conn, proto, &tui, &connection_lost);
-            
-            // DEBUG: Log after thread creation
-            std::ofstream post_thread("/tmp/radi8_ssl_debug.log", std::ios::app);
-            post_thread << "[MAIN] Receive thread created" << std::endl;
-            post_thread.close();
             
             // Send authentication request
             tui.set_status("Authenticating as " + username + "...");
@@ -248,14 +219,14 @@ int main(int, char**) {
         // Request channel list
         proto->request_channel_list();
         
-        // Auto-rejoin previously joined channels for this host
-        std::vector<std::string> prev_channels = config.get_joined_channels(host);
-        if (!prev_channels.empty()) {
-            tui.set_status("Rejoining previous channels...");
-            for (const auto& channel : prev_channels) {
-                proto->join_channel(channel, "");
-            }
-        }
+        // TEMPORARILY DISABLED: Auto-rejoin previously joined channels for this host
+        // std::vector<std::string> prev_channels = config.get_joined_channels(host);
+        // if (!prev_channels.empty()) {
+        //     tui.set_status("Rejoining previous channels...");
+        //     for (const auto& channel : prev_channels) {
+        //         proto->join_channel(channel, "");
+        //     }
+        // }
         
         // Set up input callback
         bool user_requested_disconnect = false;
@@ -314,6 +285,38 @@ int main(int, char**) {
                         msg.is_system = false;
                         tui.add_message(msg);
                     }
+                } else if (cmd == "dm") {
+                    // /dm <user> [message] — opens a DM pane and optionally sends a message
+                    if (!args.empty()) {
+                        // Extract username (accept with or without leading @) and optional message
+                        std::istringstream iss(args);
+                        std::string user; iss >> user;
+                        if (!user.empty() && user[0] == '@') user.erase(0,1);
+                        std::string dm_msg; std::getline(iss, dm_msg);
+                        if (!dm_msg.empty() && dm_msg[0] == ' ') dm_msg.erase(0,1);
+
+                        if (!user.empty()) {
+                            // Ensure a DM conversation exists and focus it
+                            tui.add_channel(user, "", true /*is_dm*/);
+                            tui.set_active_channel(user);
+                            // Optionally send message
+                            if (!dm_msg.empty()) {
+                                proto->send_message(std::string("user:") + user, dm_msg);
+                                ChatMessage my;
+                                my.channel = user;
+                                my.username = username;
+                                my.message = dm_msg;
+                                my.timestamp = get_timestamp();
+                                my.is_emote = false;
+                                my.is_system = false;
+                                tui.add_message(my);
+                            }
+                        } else {
+                            tui.set_status("Usage: /dm <user> [message]");
+                        }
+                    } else {
+                        tui.set_status("Usage: /dm <user> [message]");
+                    }
                 } else if (cmd == "topic") {
                     std::string channel = tui.get_active_channel();
                     if (!channel.empty()) {
@@ -329,27 +332,58 @@ int main(int, char**) {
                 } else if (cmd == "refresh") {
                     proto->request_channel_list();
                     tui.set_status("Refreshing channel list...");
-                } else if (cmd == "send") {
-                    // Send file: /send /path/to/file
+                } else if (cmd == "pv") {
+                    // /pv <message> — wrap entire message in <private>…</private>
                     if (!args.empty()) {
                         std::string channel = tui.get_active_channel();
                         if (!channel.empty()) {
-                            // Check if file exists
-                            std::ifstream test_file(args);
+                            std::string wrapped = std::string("<private>") + args + "</private>";
+                            std::string target = tui.is_active_channel_dm() ? "user:" + channel : channel;
+                            proto->send_message(target, wrapped);
+                            // Echo locally (will be redacted by TUI)
+                            ChatMessage msg;
+                            msg.channel = channel;
+                            msg.username = username;
+                            msg.message = wrapped;
+                            msg.timestamp = get_timestamp();
+                            msg.is_emote = false;
+                            msg.is_system = false;
+                            tui.add_message(msg);
+                        }
+                    } else {
+                        tui.set_status("Usage: /pv <message>");
+                    }
+                } else if (cmd == "send") {
+                    // Send file: /send [/path/to/file]
+                    std::string file_path = args;
+                    if (file_path.empty()) {
+                        file_path = tui.pick_file();
+                    }
+                    if (!file_path.empty()) {
+                        std::string channel = tui.get_active_channel();
+                        if (!channel.empty()) {
+                            std::ifstream test_file(file_path);
                             if (test_file.good()) {
                                 test_file.close();
                                 std::string target = tui.is_active_channel_dm() ? "user:" + channel : channel;
-                                if (proto->get_file_transfer_manager()->send_file(args, target)) {
+                                if (proto->get_file_transfer_manager()->send_file(file_path, target)) {
                                     tui.set_status("Initiating file transfer...");
                                 } else {
                                     tui.set_status("Failed to start file transfer");
                                 }
                             } else {
-                                tui.set_status("File not found: " + args);
+                                tui.set_status("File not found: " + file_path);
                             }
                         }
+                    }
+                } else if (cmd == "open") {
+                    // /open — opens the last received file
+                    std::string last_path = tui.get_last_download();
+                    if (!last_path.empty()) {
+                        tui.open_download_path(last_path);
+                        tui.set_status("Opening: " + last_path);
                     } else {
-                        tui.set_status("Usage: /send /path/to/file");
+                        tui.set_status("No recent downloads");
                     }
                 } else if (cmd == "disconnect") {
                     // Tear down connection and return to login prompt without error
@@ -450,8 +484,8 @@ int main(int, char**) {
                     bool in_dm = tui.is_active_channel_dm();
                     std::string channel = tui.get_active_channel();
                     std::string common = "/help, /refresh, /list, /clear, /disconnect, /exit";
-                    std::string dm_cmds = "/msg <user> <message>, /me <action>";
-                    std::string chan_cmds = "/join <channel> [password], /leave, /me <action>, /topic [new_topic]";
+                    std::string dm_cmds = "/dm <user> [message], /msg <user> <message>, /me <action>";
+                    std::string chan_cmds = "/join <channel> [password], /leave, /me <action>, /pv <message>, /topic [new_topic]";
                     std::string admin_cmds = "/kick <user> [reason], /ban <user> [minutes] [reason], /unban <user>";
                     ChatMessage help;
                     help.channel = channel;

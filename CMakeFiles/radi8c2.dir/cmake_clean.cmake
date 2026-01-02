@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/radi8c2.dir/src/Config.cpp.o"
+  "CMakeFiles/radi8c2.dir/src/Config.cpp.o.d"
   "CMakeFiles/radi8c2.dir/src/Connection.cpp.o"
   "CMakeFiles/radi8c2.dir/src/Connection.cpp.o.d"
   "CMakeFiles/radi8c2.dir/src/FileTransfer.cpp.o"

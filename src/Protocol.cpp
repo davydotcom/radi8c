@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 
 Protocol::Protocol(Connection* connection, TUI* ui) 
@@ -374,6 +375,13 @@ void Protocol::handle_channel_add(const std::vector<std::string>& parts) {
     
     std::string channel = parts[1];
     std::string topic = (parts.size() >= 4) ? parts[3] : "";
+    
+    // DEBUG: Log all received chanadd commands to file
+    std::ofstream logfile("/tmp/radi8c2_chanadd.log", std::ios::app);
+    if (logfile.is_open()) {
+        logfile << "[DEBUG] Received !chanadd: channel=" << channel << ", topic=" << topic << ", parts.size=" << parts.size() << std::endl;
+        logfile.close();
+    }
     
     // Add as unjoined, browsable channel
     tui->add_channel(channel, topic, false, false);

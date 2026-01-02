@@ -160,12 +160,12 @@ CMakeFiles/radi8c2.dir/all: external/FTXUI/CMakeFiles/dom.dir/all
 CMakeFiles/radi8c2.dir/all: external/FTXUI/CMakeFiles/component.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/radi8c2.dir/build.make CMakeFiles/radi8c2.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/radi8c2.dir/build.make CMakeFiles/radi8c2.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/davydotcom/projects/C++/radi8c2/CMakeFiles --progress-num=72,73,74,75,76,77 "Built target radi8c2"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/davydotcom/projects/C++/radi8c2/CMakeFiles --progress-num=72,73,74,75,76,77,78 "Built target radi8c2"
 .PHONY : CMakeFiles/radi8c2.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/radi8c2.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/davydotcom/projects/C++/radi8c2/CMakeFiles 85
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/davydotcom/projects/C++/radi8c2/CMakeFiles 86
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/radi8c2.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/davydotcom/projects/C++/radi8c2/CMakeFiles 0
 .PHONY : CMakeFiles/radi8c2.dir/rule
@@ -177,7 +177,7 @@ radi8c2: CMakeFiles/radi8c2.dir/rule
 # codegen rule for target.
 CMakeFiles/radi8c2.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/radi8c2.dir/build.make CMakeFiles/radi8c2.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/davydotcom/projects/C++/radi8c2/CMakeFiles --progress-num=72,73,74,75,76,77 "Finished codegen for target radi8c2"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/davydotcom/projects/C++/radi8c2/CMakeFiles --progress-num=72,73,74,75,76,77,78 "Finished codegen for target radi8c2"
 .PHONY : CMakeFiles/radi8c2.dir/codegen
 
 # clean rule for target.
@@ -192,7 +192,7 @@ CMakeFiles/radi8c2.dir/clean:
 external/FTXUI/CMakeFiles/screen.dir/all:
 	$(MAKE) $(MAKESILENT) -f external/FTXUI/CMakeFiles/screen.dir/build.make external/FTXUI/CMakeFiles/screen.dir/depend
 	$(MAKE) $(MAKESILENT) -f external/FTXUI/CMakeFiles/screen.dir/build.make external/FTXUI/CMakeFiles/screen.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/davydotcom/projects/C++/radi8c2/CMakeFiles --progress-num=78,79,80,81,82,83,84,85 "Built target screen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/davydotcom/projects/C++/radi8c2/CMakeFiles --progress-num=79,80,81,82,83,84,85,86 "Built target screen"
 .PHONY : external/FTXUI/CMakeFiles/screen.dir/all
 
 # Build rule for subdir invocation for target.
@@ -209,7 +209,7 @@ screen: external/FTXUI/CMakeFiles/screen.dir/rule
 # codegen rule for target.
 external/FTXUI/CMakeFiles/screen.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f external/FTXUI/CMakeFiles/screen.dir/build.make external/FTXUI/CMakeFiles/screen.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/davydotcom/projects/C++/radi8c2/CMakeFiles --progress-num=78,79,80,81,82,83,84,85 "Finished codegen for target screen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/davydotcom/projects/C++/radi8c2/CMakeFiles --progress-num=79,80,81,82,83,84,85,86 "Finished codegen for target screen"
 .PHONY : external/FTXUI/CMakeFiles/screen.dir/codegen
 
 # clean rule for target.

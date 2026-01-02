@@ -6,16 +6,21 @@
 #include <map>
 #include <memory>
 #include <functional>
+#include <unordered_set>
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 
 struct ChatMessage {
+    int id = 0;                 // unique id for UI interactions
     std::string channel;
     std::string username;
-    std::string message;
-    std::string timestamp;  // Format: [HH:MM]
+    std::string message;        // display text (may be redacted)
+    std::string raw_message;    // original text (unmodified)
+    std::string timestamp;      // Format: [HH:MM]
     bool is_emote;
     bool is_system;
+    bool has_private = false;   // message contains <private>…</private>
+    std::string open_path;      // if non-empty, clicking the message should open this path
 };
 
 struct Channel {
@@ -40,6 +45,7 @@ private:
     ftxui::Component main_component;
     ftxui::Component input_component;
     ftxui::Component conversations_container;
+    ftxui::Component message_controls;      // holds interactive widgets inside messages
     
     // Chat scrolling state
     float chat_scroll_y = 1.0f; // 0.0 = top, 1.0 = bottom
@@ -62,9 +68,24 @@ private:
     ftxui::Component join_ok_button;
     ftxui::Component join_cancel_button;
     
+    // File picker modal state
+    bool show_file_picker_modal = false;
+    std::string file_picker_path;
+    std::string file_picker_selected_file;
+    std::vector<std::string> file_picker_entries;
+    int file_picker_selected_index = 0;
+    ftxui::Component file_picker_modal_component;
+    
     std::function<void(const std::string&)> on_input_callback;
     std::function<void(const std::string& name, const std::string& password, bool is_dm)> on_join_request;
     bool should_exit;
+
+    // Private text reveal state
+    int next_msg_id = 1;
+    std::unordered_set<int> revealed_private_ids;
+    
+    // Last received download path
+    std::string last_download_path;
     
 public:
     TUI();
@@ -89,6 +110,13 @@ public:
     
     // Clear messages for a given channel/DM; if name empty, no-op.
     void clear_channel_messages(const std::string& name);
+    
+    // Track the last downloaded file for /open command
+    void set_last_download(const std::string& path) { last_download_path = path; }
+    std::string get_last_download() const { return last_download_path; }
+    void open_last_download();
+    void open_download_path(const std::string& path);
+    std::string pick_file();  // Open file picker dialog, returns path or empty string if cancelled
     
     void render();
     std::string get_active_channel() const { return active_channel; }
@@ -116,12 +144,17 @@ private:
     ftxui::Component build_channel_list();
     void refresh_conversations();
     ftxui::Component build_join_modal();
+    ftxui::Component build_file_picker_modal();
+    void refresh_file_picker_entries();
     ftxui::Element render_chat_area(); // returns inner content only (no frame/border)
     ftxui::Element render_user_list();
     ftxui::Color get_color_for_user(const std::string& username);
+    void open_file(const std::string& path);
     bool contains_url(const std::string& text);
     ftxui::Element format_text_with_urls(const std::string& line);
     ftxui::Element format_message(const ChatMessage& msg);
+    std::string redact_private(const std::string& in, bool* has_private);
+    std::string untag_private(const std::string& in);
     std::vector<std::string> wrap_text(const std::string& text, int max_width);
 };
 

@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/Users/davydotcom/projects/C++/radi8c2/src/Config.cpp" "CMakeFiles/radi8c2.dir/src/Config.cpp.o" "gcc" "CMakeFiles/radi8c2.dir/src/Config.cpp.o.d"
   "/Users/davydotcom/projects/C++/radi8c2/src/Connection.cpp" "CMakeFiles/radi8c2.dir/src/Connection.cpp.o" "gcc" "CMakeFiles/radi8c2.dir/src/Connection.cpp.o.d"
   "/Users/davydotcom/projects/C++/radi8c2/src/FileTransfer.cpp" "CMakeFiles/radi8c2.dir/src/FileTransfer.cpp.o" "gcc" "CMakeFiles/radi8c2.dir/src/FileTransfer.cpp.o.d"
   "/Users/davydotcom/projects/C++/radi8c2/src/Protocol.cpp" "CMakeFiles/radi8c2.dir/src/Protocol.cpp.o" "gcc" "CMakeFiles/radi8c2.dir/src/Protocol.cpp.o.d"

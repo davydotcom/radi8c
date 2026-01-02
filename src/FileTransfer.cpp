@@ -461,12 +461,16 @@ void FileTransferManager::finalize_transfer(const std::string& sender, int fd, i
         msg.channel = tui->get_active_channel();
         msg.username = "SYSTEM";
         msg.message = "Receive Completed: " + transfer.filename + " -> " + output_path;
+        msg.open_path = output_path;  // make message itself clickable in chat
         msg.timestamp = oss.str();
         msg.is_emote = false;
         msg.is_system = true;
         tui->add_message(msg);
         
         transfer.completed = true;
+        
+        // Track for /open command
+        tui->set_last_download(output_path);
         
         // Clear status bar
         tui->set_status("");
