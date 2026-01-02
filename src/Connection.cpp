@@ -9,6 +9,9 @@
 #include <cstring>
 #include <iostream>
 #include <fstream>
+#include <thread>
+#include <chrono>
+#include <cerrno>
 
 Connection::Connection() : sockfd(-1), ssl(nullptr), ssl_ctx(nullptr), 
                            use_ssl(false), connected(false), port(0) {}
@@ -121,15 +124,46 @@ bool Connection::send_message(const std::string& message) {
     }
     
     std::string msg = message + "\n";
-    int bytes_sent;
+    size_t total_sent = 0;
+    size_t msg_len = msg.length();
     
-    if (use_ssl && ssl) {
-        bytes_sent = SSL_write(ssl, msg.c_str(), msg.length());
-    } else {
-        bytes_sent = write(sockfd, msg.c_str(), msg.length());
+    // Keep sending until all bytes are sent
+    while (total_sent < msg_len) {
+        int bytes_sent;
+        
+        if (use_ssl && ssl) {
+            bytes_sent = SSL_write(ssl, msg.c_str() + total_sent, msg_len - total_sent);
+            
+            if (bytes_sent <= 0) {
+                int ssl_err = SSL_get_error(ssl, bytes_sent);
+                if (ssl_err == SSL_ERROR_WANT_WRITE || ssl_err == SSL_ERROR_WANT_READ) {
+                    // Temporary condition - retry after a short delay
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    continue;
+                } else {
+                    // Real error
+                    return false;
+                }
+            }
+        } else {
+            bytes_sent = write(sockfd, msg.c_str() + total_sent, msg_len - total_sent);
+            
+            if (bytes_sent <= 0) {
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    // Temporary condition - retry after a short delay
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    continue;
+                } else {
+                    // Real error
+                    return false;
+                }
+            }
+        }
+        
+        total_sent += bytes_sent;
     }
     
-    return bytes_sent > 0;
+    return true;
 }
 
 std::string Connection::receive_message(int timeout_ms) {

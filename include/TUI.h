@@ -74,6 +74,7 @@ private:
     std::string file_picker_selected_file;
     std::vector<std::string> file_picker_entries;
     int file_picker_selected_index = 0;
+    int file_picker_scroll_offset = 0;  // Track scroll position
     ftxui::Component file_picker_modal_component;
     
     std::function<void(const std::string&)> on_input_callback;

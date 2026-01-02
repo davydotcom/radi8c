@@ -28,6 +28,8 @@ void signal_handler(int) {
 }
 
 void receive_thread(Connection* conn, Protocol* proto, TUI* tui, std::atomic<bool>* connection_lost) {
+    std::string line_buffer;  // Buffer for incomplete lines
+    
     while (running && conn->is_connected()) {
         
         // Check connection before attempting receive to avoid issues during disconnect
@@ -38,6 +40,12 @@ void receive_thread(Connection* conn, Protocol* proto, TUI* tui, std::atomic<boo
         std::string message = conn->receive_message(100);
         
         if (!message.empty()) {
+            // Prepend any buffered incomplete line from previous read
+            if (!line_buffer.empty()) {
+                message = line_buffer + message;
+                line_buffer.clear();
+            }
+            
             // Process each line separately
             size_t start = 0;
             size_t pos = 0;
@@ -57,17 +65,9 @@ void receive_thread(Connection* conn, Protocol* proto, TUI* tui, std::atomic<boo
                 pos++;
             }
             
-            // Handle last line if no trailing newline
+            // Buffer incomplete line (no trailing newline) for next read
             if (start < message.length()) {
-                std::string line = message.substr(start);
-                // Remove any trailing \r
-                if (!line.empty() && line.back() == '\r') {
-                    line.pop_back();
-                }
-                if (!line.empty() && line[0] == '!') {
-                    proto->process_server_message(line);
-                    tui->render();
-                }
+                line_buffer = message.substr(start);
             }
         }
     }
@@ -212,7 +212,7 @@ int main(int, char**) {
         std::thread file_transfer_thread([&]() {
             while (running && conn.is_connected()) {
                 proto->process_file_transfers();
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));  // Send chunks at 20Hz
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));  // Minimal delay to prevent CPU spinning
             }
         });
         

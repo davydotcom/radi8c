@@ -1136,6 +1136,7 @@ void TUI::show_error(const std::string& error) {
 void TUI::refresh_file_picker_entries() {
     file_picker_entries.clear();
     file_picker_selected_index = 0;
+    file_picker_scroll_offset = 0;
     
     // Always add parent directory option
     file_picker_entries.push_back("..");
@@ -1180,8 +1181,25 @@ Component TUI::build_file_picker_modal() {
     auto menu_container = Container::Vertical({});
     
     return Renderer(menu_container, [this]() {
+        // Calculate visible window (display ~20 items at a time)
+        const int visible_items = 20;
+        
+        // Ensure selected item is visible by adjusting scroll offset
+        if (file_picker_selected_index < file_picker_scroll_offset) {
+            file_picker_scroll_offset = file_picker_selected_index;
+        } else if (file_picker_selected_index >= file_picker_scroll_offset + visible_items) {
+            file_picker_scroll_offset = file_picker_selected_index - visible_items + 1;
+        }
+        
+        // Clamp scroll offset
+        int max_scroll = std::max(0, static_cast<int>(file_picker_entries.size()) - visible_items);
+        file_picker_scroll_offset = std::max(0, std::min(file_picker_scroll_offset, max_scroll));
+        
         Elements entries_display;
-        for (size_t i = 0; i < file_picker_entries.size(); ++i) {
+        int end_idx = std::min(file_picker_scroll_offset + visible_items, 
+                               static_cast<int>(file_picker_entries.size()));
+        
+        for (int i = file_picker_scroll_offset; i < end_idx; ++i) {
             auto entry_text = text(file_picker_entries[i]);
             if (i == file_picker_selected_index) {
                 entry_text = entry_text | inverted | bold;
@@ -1190,8 +1208,15 @@ Component TUI::build_file_picker_modal() {
         }
         
         auto title = text("Select File: " + file_picker_path) | bold | center;
-        auto file_list = vbox(entries_display) | vscroll_indicator | frame | flex;
-        auto help_text = text("↑/↓: Navigate | Enter: Select | Esc: Cancel") | dim | center;
+        auto file_list = vbox(entries_display) | frame | flex;
+        
+        // Show scroll indicator if there are more items
+        std::string scroll_hint = "";
+        if (file_picker_entries.size() > visible_items) {
+            scroll_hint = " (" + std::to_string(file_picker_selected_index + 1) + 
+                         "/" + std::to_string(file_picker_entries.size()) + ")";
+        }
+        auto help_text = text("↑/↓: Navigate | Enter: Select | Esc: Cancel" + scroll_hint) | dim | center;
         
         return vbox({
             title,
@@ -1237,6 +1262,23 @@ std::string TUI::pick_file() {
                 file_picker_selected_index++;
             }
             return true;
+        }
+        
+        // Mouse wheel scrolling support
+        if (event.is_mouse()) {
+            auto& mouse = event.mouse();
+            if (mouse.button == Mouse::WheelUp) {
+                if (file_picker_selected_index > 0) {
+                    file_picker_selected_index--;
+                }
+                return true;
+            }
+            if (mouse.button == Mouse::WheelDown) {
+                if (file_picker_selected_index < static_cast<int>(file_picker_entries.size()) - 1) {
+                    file_picker_selected_index++;
+                }
+                return true;
+            }
         }
         
         if (event == Event::Return) {
