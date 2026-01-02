@@ -487,17 +487,47 @@ int main(int, char**) {
                 } else if (cmd == "help" || cmd == "h") {
                     bool in_dm = tui.is_active_channel_dm();
                     std::string channel = tui.get_active_channel();
-                    std::string common = "/help, /refresh, /list, /clear, /disconnect, /exit";
-                    std::string dm_cmds = "/dm <user> [message], /msg <user> <message>, /me <action>";
-                    std::string chan_cmds = "/join <channel> [password], /leave, /me <action>, /pv <message>, /topic [new_topic]";
-                    std::string admin_cmds = "/kick <user> [reason], /ban <user> [minutes] [reason], /unban <user>";
+                    
+                    // Build a formatted help message with descriptions
+                    std::string help_text = "Available Commands:\n";
+                    
+                    if (in_dm) {
+                        // DM-specific commands
+                        help_text += "/dm <user> [message] - Start or send a direct message\n";
+                        help_text += "/msg <user> <message> - Send a private message\n";
+                        help_text += "/me <action> - Send an action/emote\n";
+                    } else {
+                        // Channel-specific commands
+                        help_text += "/join <channel> [password] - Join a channel\n";
+                        help_text += "/leave - Leave the current channel\n";
+                        help_text += "/me <action> - Send an action/emote\n";
+                        help_text += "/pv <message> - Send a private message to channel members\n";
+                        help_text += "/topic [new_topic] - View or set channel topic\n";
+                        help_text += "\n";
+                        // Admin commands
+                        help_text += "Admin Commands:\n";
+                        help_text += "/kick <user> [reason] - Kick a user from channel\n";
+                        help_text += "/ban <user> [minutes] [reason] - Ban a user\n";
+                        help_text += "/unban <user> - Remove a ban\n";
+                    }
+                    
+                    // Common commands
+                    help_text += "\n";
+                    help_text += "Common Commands:\n";
+                    help_text += "/help - Show this help message\n";
+                    help_text += "/refresh - Refresh the UI\n";
+                    help_text += "/list - List available channels\n";
+                    help_text += "/clear - Clear messages in current channel\n";
+                    help_text += "/disconnect - Disconnect from server\n";
+                    help_text += "/exit - Quit the application";
+                    
                     ChatMessage help;
                     help.channel = channel;
                     help.username = "HELP";
                     help.timestamp = get_timestamp();
                     help.is_system = true;
                     help.is_emote = false;
-                    help.message = std::string("Available: ") + (in_dm ? dm_cmds : (chan_cmds + "; Admin: " + admin_cmds)) + ". Also: " + common;
+                    help.message = help_text;
                     tui.add_message(help);
                 }
             } else {

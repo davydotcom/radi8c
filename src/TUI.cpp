@@ -223,6 +223,7 @@ void TUI::clear_channel_messages(const std::string& name) {
 Component TUI::build_join_modal() {
     // Inputs
     InputOption target_opt;
+    target_opt.multiline = false;  // Single-line input only
     join_target_input_component = Input(&join_target_input, "channel or @user", target_opt);
     
     InputOption pw_opt;
@@ -862,11 +863,29 @@ Component TUI::build_ui() {
         // Build status row
         auto status = hbox({ text(status_text) | inverted | flex });
         
-        // Visual preview: wrapped paragraph of the input content.
-        auto input_visual = hbox({
-            text("> "),
-            paragraph(input_content) | flex,
-        });
+        // Visual preview: wrapped paragraph of the input content with cursor when focused
+        Element input_visual;
+        if (input_component && input_component->Focused()) {
+            // Show cursor when focused - insert at cursor position
+            int cursor_pos = std::min(input_cursor_pos, static_cast<int>(input_content.size()));
+            std::string before_cursor = input_content.substr(0, cursor_pos);
+            std::string after_cursor = input_content.substr(cursor_pos);
+            
+            input_visual = hbox({
+                text("> "),
+                text(before_cursor),
+                text(" ") | inverted,  // Inverted space as cursor
+                text(after_cursor),
+                filler(),
+            });
+        } else {
+            // No cursor when not focused
+            input_visual = hbox({
+                text("> "),
+                paragraph(input_content) | flex,
+            });
+        }
+        
         // Transparent overlay to focus the input when clicked anywhere on the visual area.
         auto focus_proxy = CatchEvent(Renderer([](){ return emptyElement(); }), [this](Event e){
             if (e.is_mouse() && e.mouse().button == Mouse::Left && e.mouse().motion == Mouse::Pressed) {
@@ -906,6 +925,13 @@ Component TUI::build_ui() {
     auto component_with_keys = CatchEvent(renderer, [this](Event event) {
         if (event == Event::Escape || event == Event::CtrlC) {
             exit_loop();
+            return true;
+        }
+        
+        // Tab key returns focus to input component
+        if (!show_join_modal && event == Event::Tab) {
+            input_component->TakeFocus();
+            render();
             return true;
         }
         
