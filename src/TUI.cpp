@@ -6,9 +6,21 @@
 #include <sstream>
 #include <climits>
 #include <cstdio>
-#include <unistd.h>
-#include <dirent.h>
-#include <sys/stat.h>
+
+#ifdef _WIN32
+    #define NOMINMAX
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+    #include <shellapi.h>
+    #include <direct.h>
+    #pragma comment(lib, "shell32.lib")
+    #define access _access
+    #define F_OK 0
+#else
+    #include <unistd.h>
+    #include <dirent.h>
+    #include <sys/stat.h>
+#endif
 
 using namespace ftxui;
 
@@ -24,13 +36,16 @@ void TUI::init() {
 }
 
 void TUI::open_file(const std::string& path) {
-#if defined(__APPLE__) || defined(__MACH__)
+#ifdef _WIN32
+    // Use Windows API to open file with default application
+    ShellExecuteA(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
+#elif defined(__APPLE__) || defined(__MACH__)
     std::string cmd = std::string("open ") + '"' + path + '"';
+    std::system(cmd.c_str());
 #else
     std::string cmd = std::string("xdg-open ") + '"' + path + '"';
-#endif
-    // Fire and forget
     std::system(cmd.c_str());
+#endif
 }
 
 void TUI::open_download_path(const std::string& path) {
@@ -289,6 +304,18 @@ Color TUI::get_color_for_user(const std::string& username) {
     // Hash username to get consistent color
     size_t hash = std::hash<std::string>{}(username);
     
+#ifdef _WIN32
+    // Windows classic blue TUI color palette
+    std::vector<Color> colors = {
+        Color::CyanLight,
+        Color::Cyan,
+        Color::White,
+        Color::Yellow,
+        Color::GreenLight,
+        Color::Magenta
+    };
+#else
+    // Unix/Linux color palette
     std::vector<Color> colors = {
         Color::Cyan,
         Color::Green,
@@ -297,6 +324,7 @@ Color TUI::get_color_for_user(const std::string& username) {
         Color::Blue,
         Color::CyanLight
     };
+#endif
     
     return colors[hash % colors.size()];
 }
@@ -444,7 +472,11 @@ Element TUI::format_message(const ChatMessage& msg) {
         if (!msg.open_path.empty()) {
             ButtonOption opt = ButtonOption::Simple();
             opt.transform = [](const EntryState& s){
+#ifdef _WIN32
+                auto e = text(s.label) | underlined | color(Color::CyanLight);  // Windows: bright cyan
+#else
                 auto e = text(s.label) | underlined | color(Color::Cyan);
+#endif
                 if (s.focused) e = e | bold;
                 return e;
             };
@@ -456,7 +488,11 @@ Element TUI::format_message(const ChatMessage& msg) {
             }
         } else {
             for (const auto& line : wrapped) {
+#ifdef _WIN32
+                lines.push_back(text(line) | color(Color::Yellow));  // Windows: yellow for system messages
+#else
                 lines.push_back(text(line) | color(Color::Red));
+#endif
             }
         }
         return vbox(lines);
@@ -465,7 +501,11 @@ Element TUI::format_message(const ChatMessage& msg) {
         auto wrapped = wrap_text(emote_text, message_width);
         Elements lines;
         for (const auto& line : wrapped) {
+#ifdef _WIN32
+            lines.push_back(text(line) | italic | color(Color::CyanLight));  // Windows: bright cyan for emotes
+#else
             lines.push_back(text(line) | italic | color(Color::GreenLight));
+#endif
         }
         return vbox(lines);
     } else {
@@ -528,7 +568,11 @@ Element TUI::format_message(const ChatMessage& msg) {
             // Make the wrapped lines clickable
             ButtonOption opt = ButtonOption::Simple();
             opt.transform = [](const EntryState& s){
+#ifdef _WIN32
+                auto e = text(s.label) | underlined | color(Color::CyanLight);  // Windows: bright cyan
+#else
                 auto e = text(s.label) | underlined | color(Color::Cyan);
+#endif
                 if (s.focused) e = e | bold;
                 return e;
             };
@@ -556,7 +600,11 @@ Element TUI::format_message(const ChatMessage& msg) {
                         
                         auto elem = hbox({
                             text(timestamp_part),
+#ifdef _WIN32
+                            text(username_part) | color(Color::CyanLight) | bold,  // Windows: bright cyan
+#else
                             text(username_part) | color(Color::Green),
+#endif
                             text(rest_part)
                         });
                         lines.push_back(elem);
@@ -836,6 +884,11 @@ Component TUI::build_ui() {
             input_box,
             status | size(HEIGHT, EQUAL, 1),
         });
+        
+#ifdef _WIN32
+        // Windows classic blue background
+        base = base | bgcolor(Color::Blue);
+#endif
         
         if (show_join_modal) {
             // Overlay modal centered without decorators to avoid operator issues
@@ -1141,6 +1194,31 @@ void TUI::refresh_file_picker_entries() {
     // Always add parent directory option
     file_picker_entries.push_back("..");
     
+#ifdef _WIN32
+    // Windows directory enumeration
+    std::string search_path = file_picker_path + "\\*";
+    WIN32_FIND_DATAA find_data;
+    HANDLE hFind = FindFirstFileA(search_path.c_str(), &find_data);
+    
+    if (hFind == INVALID_HANDLE_VALUE) return;
+    
+    std::vector<std::string> directories;
+    std::vector<std::string> files;
+    
+    do {
+        std::string name = find_data.cFileName;
+        if (name == "." || name == "..") continue;
+        
+        if (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            directories.push_back(name + "/");
+        } else {
+            files.push_back(name);
+        }
+    } while (FindNextFileA(hFind, &find_data) != 0);
+    
+    FindClose(hFind);
+#else
+    // Unix directory enumeration
     DIR* dir = opendir(file_picker_path.c_str());
     if (!dir) return;
     
@@ -1163,6 +1241,7 @@ void TUI::refresh_file_picker_entries() {
         }
     }
     closedir(dir);
+#endif
     
     // Sort and add directories first, then files
     std::sort(directories.begin(), directories.end());
@@ -1230,12 +1309,21 @@ Component TUI::build_file_picker_modal() {
 
 std::string TUI::pick_file() {
     // Initialize file picker with current directory
+#ifdef _WIN32
+    char cwd_buffer[MAX_PATH];
+    if (_getcwd(cwd_buffer, sizeof(cwd_buffer)) != nullptr) {
+        file_picker_path = cwd_buffer;
+    } else {
+        file_picker_path = "C:\\";
+    }
+#else
     char cwd_buffer[PATH_MAX];
     if (getcwd(cwd_buffer, sizeof(cwd_buffer)) != nullptr) {
         file_picker_path = cwd_buffer;
     } else {
         file_picker_path = "/";
     }
+#endif
     
     refresh_file_picker_entries();
     file_picker_selected_file.clear();

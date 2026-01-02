@@ -18,11 +18,11 @@ A terminal user interface (TUI) chat client for the radi8d server with SSL/TLS s
 
 ## Requirements
 
-- C++17 compiler (g++ or clang++)
+- C++17 compiler (g++, clang++, or MSVC)
 - CMake 3.11 or higher
 - OpenSSL 3.x (for SSL support)
 - FTXUI (included as submodule)
-- POSIX-compliant operating system (Linux, macOS, BSD)
+- Operating system: Linux, macOS, or Windows
 
 ### macOS Installation
 ```bash
@@ -38,8 +38,27 @@ sudo apt-get install cmake libssl-dev build-essential
 sudo dnf install cmake openssl-devel gcc-c++
 ```
 
+### Windows Installation
+```powershell
+# Install Visual Studio 2019 or newer with C++ tools
+# Or install MinGW-w64
+
+# Install CMake from cmake.org
+
+# Install OpenSSL using vcpkg (recommended):
+git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
+.\bootstrap-vcpkg.bat
+.\vcpkg install openssl:x64-windows
+.\vcpkg integrate install
+
+# Or download OpenSSL pre-built binaries from:
+# https://slproweb.com/products/Win32OpenSSL.html
+```
+
 ## Building
 
+### Linux/macOS
 ```bash
 # Clone with submodules
 git submodule update --init --recursive
@@ -56,6 +75,38 @@ cmake --build .
 To clean the build:
 ```bash
 rm -rf build
+```
+
+### Windows (with vcpkg)
+```powershell
+# Clone with submodules
+git submodule update --init --recursive
+
+# Build using vcpkg toolchain
+mkdir build
+cd build
+cmake .. -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake --build . --config Release
+
+# Run
+.\Release\radi8c2.exe
+```
+
+### Windows (without vcpkg)
+```powershell
+# If you installed OpenSSL manually, specify its location:
+mkdir build
+cd build
+cmake .. -DOPENSSL_ROOT_DIR="C:/Program Files/OpenSSL-Win64"
+cmake --build . --config Release
+
+# Run
+.\Release\radi8c2.exe
+```
+
+To clean the build:
+```powershell
+Remove-Item -Recurse -Force build
 ```
 
 ## Usage

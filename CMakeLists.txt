@@ -39,8 +39,14 @@ target_link_libraries(radi8c2 PRIVATE
     ftxui::component
     OpenSSL::SSL
     OpenSSL::Crypto
-    pthread
 )
+
+# Platform-specific libraries
+if(WIN32)
+    target_link_libraries(radi8c2 PRIVATE ws2_32 shell32)
+else()
+    target_link_libraries(radi8c2 PRIVATE pthread)
+endif()
 
 # macOS specific
 if(APPLE)

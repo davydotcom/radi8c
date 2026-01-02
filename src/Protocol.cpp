@@ -1,3 +1,7 @@
+#ifdef _WIN32
+    #define NOMINMAX
+#endif
+
 #include "Protocol.h"
 #include <algorithm>
 #include <ctime>
