@@ -1,23 +1,45 @@
 #include "Connection.h"
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/select.h>
 #include <cstring>
 #include <iostream>
 #include <fstream>
 #include <thread>
 #include <chrono>
-#include <cerrno>
+
+#ifdef _WIN32
+    #define NOMINMAX
+    #define WIN32_LEAN_AND_MEAN
+    #include <winsock2.h>
+    #include <ws2tcpip.h>
+    #include <windows.h>
+    #pragma comment(lib, "ws2_32.lib")
+    typedef int socklen_t;
+    #define close closesocket
+    #define SHUT_RDWR SD_BOTH
+#else
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <arpa/inet.h>
+    #include <netdb.h>
+    #include <unistd.h>
+    #include <fcntl.h>
+    #include <sys/select.h>
+    #include <cerrno>
+#endif
 
 Connection::Connection() : sockfd(-1), ssl(nullptr), ssl_ctx(nullptr), 
-                           use_ssl(false), connected(false), port(0) {}
+                           use_ssl(false), connected(false), port(0) {
+#ifdef _WIN32
+    // Initialize Winsock
+    WSADATA wsaData;
+    WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif
+}
 
 Connection::~Connection() {
     disconnect();
+#ifdef _WIN32
+    WSACleanup();
+#endif
 }
 
 bool Connection::init_ssl() {
@@ -146,10 +168,15 @@ bool Connection::send_message(const std::string& message) {
                 }
             }
         } else {
-            bytes_sent = write(sockfd, msg.c_str() + total_sent, msg_len - total_sent);
+            bytes_sent = send(sockfd, msg.c_str() + total_sent, msg_len - total_sent, 0);
             
             if (bytes_sent <= 0) {
+#ifdef _WIN32
+                int err = WSAGetLastError();
+                if (err == WSAEWOULDBLOCK) {
+#else
                 if (errno == EAGAIN || errno == EWOULDBLOCK) {
+#endif
                     // Temporary condition - retry after a short delay
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                     continue;
@@ -195,7 +222,7 @@ std::string Connection::receive_message(int timeout_ms) {
             }
         }
     } else {
-        bytes_received = read(sockfd, buffer, sizeof(buffer) - 1);
+        bytes_received = recv(sockfd, buffer, sizeof(buffer) - 1, 0);
         
         if (bytes_received <= 0) {
             connected = false;

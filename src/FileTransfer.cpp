@@ -1,12 +1,23 @@
+#ifdef _WIN32
+    #define NOMINMAX
+    #include <windows.h>
+    #include <direct.h>
+    #include <io.h>
+    #define mkdir(path, mode) _mkdir(path)
+    #define access _access
+    #define F_OK 0
+#else
+    #include <sys/stat.h>
+    #include <unistd.h>
+    #include <pwd.h>
+#endif
+
 #include "FileTransfer.h"
 #include "Protocol.h"
 #include "TUI.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <pwd.h>
 #include <ctime>
 #include <iomanip>
 #include <cmath>
@@ -122,6 +133,16 @@ std::vector<uint8_t> FileTransferManager::base64_decode(const std::string& encod
 }
 
 std::string FileTransferManager::get_download_dir() {
+#ifdef _WIN32
+    const char* home = getenv("USERPROFILE");
+    if (!home) home = "C:\\";
+    std::string dir = std::string(home) + "\\radi8-files";
+    
+    // Create directory if it doesn't exist
+    if (GetFileAttributesA(dir.c_str()) == INVALID_FILE_ATTRIBUTES) {
+        mkdir(dir.c_str(), 0);
+    }
+#else
     const char* home = getenv("HOME");
     if (!home) home = getpwuid(getuid())->pw_dir;
     
@@ -132,6 +153,7 @@ std::string FileTransferManager::get_download_dir() {
     if (stat(dir.c_str(), &st) != 0) {
         mkdir(dir.c_str(), 0755);
     }
+#endif
     
     return dir;
 }

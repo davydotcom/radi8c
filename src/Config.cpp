@@ -1,9 +1,16 @@
 #include "Config.h"
 #include <fstream>
 #include <sstream>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <pwd.h>
+
+#ifdef _WIN32
+    #include <windows.h>
+    #include <direct.h>
+    #include <shlobj.h>
+#else
+    #include <sys/stat.h>
+    #include <unistd.h>
+    #include <pwd.h>
+#endif
 
 Config::Config() {
     config_path = get_config_path();
@@ -15,13 +22,22 @@ Config::Config() {
 }
 
 std::string Config::get_config_path() const {
-    // Get home directory
+#ifdef _WIN32
+    // Get AppData directory on Windows
+    const char* appdata = getenv("APPDATA");
+    if (appdata) {
+        return std::string(appdata) + "\\radi8c.conf";
+    }
+    return "radi8c.conf";  // Fallback to current directory
+#else
+    // Get home directory on Unix
     const char* home = getenv("HOME");
     if (!home) {
         struct passwd* pw = getpwuid(getuid());
         home = pw->pw_dir;
     }
     return std::string(home) + "/.radi8c";
+#endif
 }
 
 bool Config::load() {
