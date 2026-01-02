@@ -1,0 +1,10 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/davydotcom/projects/C++/radi8c2/cmake_install.cmake",
+		"/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/cmake_install.cmake",
+		"/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/examples/cmake_install.cmake",
+		"/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/doc/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

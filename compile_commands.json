@@ -1,0 +1,458 @@
+[
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/box.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/box.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/box.cpp",
+  "output": "external/FTXUI/CMakeFiles/screen.dir/src/ftxui/screen/box.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/color.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/color.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/color.cpp",
+  "output": "external/FTXUI/CMakeFiles/screen.dir/src/ftxui/screen/color.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/color_info.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/color_info.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/color_info.cpp",
+  "output": "external/FTXUI/CMakeFiles/screen.dir/src/ftxui/screen/color_info.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/image.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/image.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/image.cpp",
+  "output": "external/FTXUI/CMakeFiles/screen.dir/src/ftxui/screen/image.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/screen.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/screen.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/screen.cpp",
+  "output": "external/FTXUI/CMakeFiles/screen.dir/src/ftxui/screen/screen.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/string.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/string.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/string.cpp",
+  "output": "external/FTXUI/CMakeFiles/screen.dir/src/ftxui/screen/string.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/screen.dir/src/ftxui/screen/terminal.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/terminal.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/screen/terminal.cpp",
+  "output": "external/FTXUI/CMakeFiles/screen.dir/src/ftxui/screen/terminal.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/automerge.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/automerge.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/automerge.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/automerge.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/selection_style.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/selection_style.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/selection_style.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/selection_style.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/blink.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/blink.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/blink.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/blink.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/bold.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/bold.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/bold.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/bold.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/border.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/border.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/border.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/border.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/box_helper.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/box_helper.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/box_helper.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/box_helper.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/canvas.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/canvas.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/canvas.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/canvas.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/clear_under.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/clear_under.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/clear_under.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/clear_under.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/color.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/color.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/color.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/color.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/composite_decorator.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/composite_decorator.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/composite_decorator.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/composite_decorator.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/dbox.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/dbox.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/dbox.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/dbox.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/dim.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/dim.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/dim.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/dim.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/flex.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/flex.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/flex.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/flex.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/flexbox.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/flexbox.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/flexbox.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/flexbox.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/flexbox_config.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/flexbox_config.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/flexbox_config.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/flexbox_config.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/flexbox_helper.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/flexbox_helper.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/flexbox_helper.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/flexbox_helper.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/focus.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/focus.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/focus.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/focus.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/frame.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/frame.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/frame.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/frame.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/gauge.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/gauge.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/gauge.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/gauge.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/graph.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/graph.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/graph.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/graph.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/gridbox.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/gridbox.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/gridbox.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/gridbox.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/hbox.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/hbox.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/hbox.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/hbox.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/hyperlink.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/hyperlink.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/hyperlink.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/hyperlink.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/inverted.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/inverted.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/inverted.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/inverted.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/italic.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/italic.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/italic.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/italic.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/linear_gradient.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/linear_gradient.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/linear_gradient.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/linear_gradient.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/node.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/node.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/node.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/node.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/node_decorator.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/node_decorator.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/node_decorator.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/node_decorator.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/paragraph.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/paragraph.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/paragraph.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/paragraph.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/reflect.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/reflect.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/reflect.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/reflect.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/scroll_indicator.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/scroll_indicator.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/scroll_indicator.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/scroll_indicator.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/selection.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/selection.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/selection.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/selection.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/separator.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/separator.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/separator.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/separator.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/size.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/size.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/size.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/size.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/spinner.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/spinner.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/spinner.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/spinner.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/strikethrough.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/strikethrough.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/strikethrough.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/strikethrough.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/table.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/table.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/table.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/table.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/text.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/text.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/text.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/text.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/underlined.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/underlined.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/underlined.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/underlined.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/underlined_double.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/underlined_double.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/underlined_double.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/underlined_double.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/util.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/util.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/util.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/util.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/dom.dir/src/ftxui/dom/vbox.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/vbox.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/dom/vbox.cpp",
+  "output": "external/FTXUI/CMakeFiles/dom.dir/src/ftxui/dom/vbox.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/animation.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/animation.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/animation.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/animation.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/button.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/button.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/button.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/button.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/catch_event.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/catch_event.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/catch_event.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/catch_event.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/checkbox.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/checkbox.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/checkbox.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/checkbox.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/collapsible.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/collapsible.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/collapsible.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/collapsible.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/component.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/component.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/component.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/component.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/component_options.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/component_options.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/component_options.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/component_options.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/container.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/container.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/container.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/container.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/dropdown.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/dropdown.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/dropdown.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/dropdown.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/event.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/event.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/event.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/event.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/hoverable.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/hoverable.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/hoverable.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/hoverable.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/input.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/input.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/input.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/input.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/loop.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/loop.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/loop.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/loop.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/maybe.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/maybe.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/maybe.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/maybe.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/menu.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/menu.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/menu.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/menu.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/modal.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/modal.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/modal.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/modal.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/radiobox.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/radiobox.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/radiobox.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/radiobox.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/renderer.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/renderer.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/renderer.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/renderer.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/resizable_split.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/resizable_split.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/resizable_split.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/resizable_split.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/screen_interactive.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/screen_interactive.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/screen_interactive.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/screen_interactive.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/slider.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/slider.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/slider.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/slider.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/task.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/task.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/task.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/task.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/task_queue.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/task_queue.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/task_queue.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/task_queue.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/task_runner.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/task_runner.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/task_runner.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/task_runner.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/terminal_input_parser.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/terminal_input_parser.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/terminal_input_parser.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/terminal_input_parser.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/util.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/util.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/util.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/util.cpp.o"
+},
+{
+  "directory": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI",
+  "command": "/usr/bin/c++  -I/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src -isystem /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/include -std=gnu++17 -arch arm64 -fPIC -o CMakeFiles/component.dir/src/ftxui/component/window.cpp.o -c /Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/window.cpp",
+  "file": "/Users/davydotcom/projects/C++/radi8c2/external/FTXUI/src/ftxui/component/window.cpp",
+  "output": "external/FTXUI/CMakeFiles/component.dir/src/ftxui/component/window.cpp.o"
+}
+]

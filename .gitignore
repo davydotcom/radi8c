@@ -1,0 +1,27 @@
+# Compiled binary
+radi8c2
+
+# Build directory
+build/
+
+# Object files
+obj/
+*.o
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# Debug files
+*.dSYM/
+
+# Temporary files
+*.tmp
+*.swp
+*~

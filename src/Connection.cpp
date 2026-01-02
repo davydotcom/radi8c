@@ -1,0 +1,240 @@
+#include "Connection.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/select.h>
+#include <cstring>
+#include <iostream>
+#include <fstream>
+
+Connection::Connection() : sockfd(-1), ssl(nullptr), ssl_ctx(nullptr), 
+                           use_ssl(false), connected(false), port(0) {}
+
+Connection::~Connection() {
+    disconnect();
+}
+
+bool Connection::init_ssl() {
+    SSL_library_init();
+    SSL_load_error_strings();
+    OpenSSL_add_all_algorithms();
+    
+    ssl_ctx = SSL_CTX_new(TLS_client_method());
+    if (!ssl_ctx) {
+        ERR_print_errors_fp(stderr);
+        return false;
+    }
+    
+    // Don't verify certificate for client (accept self-signed)
+    SSL_CTX_set_verify(ssl_ctx, SSL_VERIFY_NONE, nullptr);
+    
+    return true;
+}
+
+void Connection::cleanup_ssl() {
+    if (ssl) {
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        ssl = nullptr;
+    }
+    if (ssl_ctx) {
+        SSL_CTX_free(ssl_ctx);
+        ssl_ctx = nullptr;
+    }
+}
+
+bool Connection::connect_to_server(const std::string& host, int p, bool use_ssl_param) {
+    hostname = host;
+    port = p;
+    use_ssl = use_ssl_param;
+    
+    // Create socket
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        std::cerr << "Failed to create socket" << std::endl;
+        return false;
+    }
+    
+    // Resolve hostname
+    struct hostent* server = gethostbyname(host.c_str());
+    if (!server) {
+        std::cerr << "Failed to resolve hostname: " << host << std::endl;
+        close(sockfd);
+        sockfd = -1;
+        return false;
+    }
+    
+    // Connect
+    struct sockaddr_in serv_addr;
+    memset(&serv_addr, 0, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
+    serv_addr.sin_port = htons(port);
+    
+    if (connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+        std::cerr << "Failed to connect to server" << std::endl;
+        close(sockfd);
+        sockfd = -1;
+        return false;
+    }
+    
+    // SSL handshake if needed
+    if (use_ssl) {
+        if (!init_ssl()) {
+            std::cerr << "Failed to initialize SSL" << std::endl;
+            close(sockfd);
+            sockfd = -1;
+            return false;
+        }
+        
+        ssl = SSL_new(ssl_ctx);
+        if (!ssl) {
+            std::cerr << "Failed to create SSL structure" << std::endl;
+            cleanup_ssl();
+            close(sockfd);
+            sockfd = -1;
+            return false;
+        }
+        
+        SSL_set_fd(ssl, sockfd);
+        
+        if (SSL_connect(ssl) <= 0) {
+            std::cerr << "SSL handshake failed" << std::endl;
+            ERR_print_errors_fp(stderr);
+            cleanup_ssl();
+            close(sockfd);
+            sockfd = -1;
+            return false;
+        }
+    }
+    
+    connected = true;
+    return true;
+}
+
+bool Connection::send_message(const std::string& message) {
+    if (!connected || sockfd < 0) {
+        return false;
+    }
+    
+    std::string msg = message + "\n";
+    int bytes_sent;
+    
+    // DEBUG: Log SSL sends
+    if (use_ssl && message.find("!name") == 0) {
+        std::ofstream debug("/tmp/radi8_ssl_debug.log", std::ios::app);
+        debug << "[SSL SEND] " << message << " (" << msg.length() << " bytes)" << std::endl;
+        debug.close();
+    }
+    
+    if (use_ssl && ssl) {
+        bytes_sent = SSL_write(ssl, msg.c_str(), msg.length());
+    } else {
+        bytes_sent = write(sockfd, msg.c_str(), msg.length());
+    }
+    
+    // DEBUG: Log result
+    if (use_ssl && message.find("!name") == 0) {
+        std::ofstream debug("/tmp/radi8_ssl_debug.log", std::ios::app);
+        debug << "[SSL SEND RESULT] bytes_sent=" << bytes_sent << std::endl;
+        debug.close();
+    }
+    
+    return bytes_sent > 0;
+}
+
+std::string Connection::receive_message(int timeout_ms) {
+    if (!connected || sockfd < 0) {
+        return "";
+    }
+    
+    // DEBUG: Log receive attempt
+    if (use_ssl) {
+        std::ofstream debug("/tmp/radi8_ssl_debug.log", std::ios::app);
+        debug << "[SSL_READ ATTEMPT] timeout_ms=" << timeout_ms << std::endl;
+        debug.close();
+    }
+    
+    char buffer[131072];  // 128KB to match server buffer size
+    int bytes_received;
+    
+    if (use_ssl && ssl) {
+        // DEBUG: Log before SSL_read
+        std::ofstream debug_before("/tmp/radi8_ssl_debug.log", std::ios::app);
+        debug_before << "[BEFORE SSL_READ] about to call SSL_read" << std::endl;
+        debug_before.flush();
+        debug_before.close();
+        
+        bytes_received = SSL_read(ssl, buffer, sizeof(buffer) - 1);
+        
+        // DEBUG: Log all SSL reads
+        std::ofstream debug_read("/tmp/radi8_ssl_debug.log", std::ios::app);
+        debug_read << "[SSL READ] bytes_received=" << bytes_received << std::endl;
+        debug_read.close();
+        
+        // DEBUG: Log SSL read errors
+        if (bytes_received <= 0) {
+            int ssl_err = SSL_get_error(ssl, bytes_received);
+            std::ofstream debug("/tmp/radi8_ssl_debug.log", std::ios::app);
+            debug << "[SSL READ ERROR] bytes_received=" << bytes_received << " SSL_get_error=" << ssl_err << std::endl;
+            debug.close();
+            
+            // Check if it's a real error or just no data available
+            if (ssl_err == SSL_ERROR_WANT_READ || ssl_err == SSL_ERROR_WANT_WRITE) {
+                // Not an error, just no data available yet
+                return "";
+            } else if (ssl_err == SSL_ERROR_ZERO_RETURN) {
+                // Clean SSL shutdown
+                connected = false;
+                return "";
+            } else {
+                // Real error
+                connected = false;
+                return "";
+            }
+        }
+    } else {
+        bytes_received = read(sockfd, buffer, sizeof(buffer) - 1);
+        
+        if (bytes_received <= 0) {
+            connected = false;
+            return "";
+        }
+    }
+    
+    if (bytes_received <= 0) {
+        // This shouldn't happen for SSL after the above check, but keep it for non-SSL
+        return "";
+    }
+    
+    buffer[bytes_received] = '\0';
+    std::string result(buffer);
+    
+    // DEBUG: Log SSL receives
+    if (use_ssl && !result.empty()) {
+        std::ofstream debug("/tmp/radi8_ssl_debug.log", std::ios::app);
+        debug << "[SSL RECV] " << bytes_received << " bytes: " << result.substr(0, 200) << std::endl;
+        debug.close();
+    }
+    
+    return result;
+}
+
+void Connection::disconnect() {
+    // Proactively wake any blocking readers before tearing down SSL
+    if (sockfd >= 0) {
+        // Shutdown both directions to interrupt blocking SSL_read/recv in other threads
+        ::shutdown(sockfd, SHUT_RDWR);
+    }
+    if (use_ssl) {
+        cleanup_ssl();
+    }
+    if (sockfd >= 0) {
+        close(sockfd);
+        sockfd = -1;
+    }
+    connected = false;
+}
