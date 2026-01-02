@@ -99,6 +99,7 @@ public:
     void add_channel(const std::string& name, const std::string& topic = "", bool is_dm = false, bool joined = false);
     void remove_channel(const std::string& name);
     void clear_unjoined_channels();
+    void clear_all_channels();
     void set_active_channel(const std::string& name);
     void set_channel_joined(const std::string& name, bool joined);
     void add_message(const ChatMessage& msg);

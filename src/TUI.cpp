@@ -107,6 +107,13 @@ void TUI::clear_unjoined_channels() {
     refresh_conversations();
 }
 
+void TUI::clear_all_channels() {
+    // Clear all channels and reset active channel
+    channels.clear();
+    active_channel.clear();
+    refresh_conversations();
+}
+
 std::string TUI::get_first_active_channel() const {
     // Priority: joined channels or DMs
     for (const auto& [name, ch] : channels) {
@@ -1036,6 +1043,11 @@ bool TUI::show_login_dialog(std::string& host, int& port, bool& use_ssl,
         user_input,
         pass_input,
     });
+    
+    // If all fields except password are filled, focus password field
+    if (!host.empty() && !username.empty()) {
+        pass_input->TakeFocus();
+    }
     
     auto renderer = Renderer(container, [&]() {
         return vbox({

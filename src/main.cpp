@@ -97,6 +97,9 @@ int main(int, char**) {
         bool want_reconnect = true;
         
         while (want_reconnect && running) {
+            // Clear all channels from previous connection
+            tui.clear_all_channels();
+            
             // Show login dialog and authenticate (loop until success or cancel)
             std::string host, username, password;
             int port;
@@ -330,6 +333,7 @@ int main(int, char**) {
                     proto->request_channel_list();
                     tui.set_status("Requested channel list");
                 } else if (cmd == "refresh") {
+                    tui.clear_unjoined_channels();
                     proto->request_channel_list();
                     tui.set_status("Refreshing channel list...");
                 } else if (cmd == "pv") {
