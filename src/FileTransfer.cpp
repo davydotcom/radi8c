@@ -224,10 +224,10 @@ void FileTransferManager::process_outgoing_transfers() {
         std::string base64_chunk = base64_encode(chunk_data);
         
         // DEBUG: Log chunk sending
-        std::ofstream debug_log("/tmp/radi8_debug.log", std::ios::app);
-        debug_log << "[DEBUG] Sending chunk " << seq << ": raw=" << chunk_size 
-                  << " bytes, base64=" << base64_chunk.size() << " bytes" << std::endl;
-        debug_log.close();
+        // std::ofstream debug_log("/tmp/radi8_debug.log", std::ios::app);
+        // debug_log << "[DEBUG] Sending chunk " << seq << ": raw=" << chunk_size 
+        //           << " bytes, base64=" << base64_chunk.size() << " bytes" << std::endl;
+        // debug_log.close();
         
         // Format message
         std::string message;
@@ -345,11 +345,11 @@ void FileTransferManager::receive_chunk(const std::string& sender, int fd, int s
     std::vector<uint8_t> chunk_data = base64_decode(base64_data);
     
     // DEBUG: Log chunk reception to file
-    std::ofstream debug_log("/tmp/radi8_debug.log", std::ios::app);
-    debug_log << "[DEBUG] Received chunk " << sequence << " from " << sender 
-              << " (" << chunk_data.size() << " bytes, expecting seq " 
-              << transfer.next_sequential_chunk << ")" << std::endl;
-    debug_log.close();
+    // std::ofstream debug_log("/tmp/radi8_debug.log", std::ios::app);
+    // debug_log << "[DEBUG] Received chunk " << sequence << " from " << sender 
+    //           << " (" << chunk_data.size() << " bytes, expecting seq " 
+    //           << transfer.next_sequential_chunk << ")" << std::endl;
+    // debug_log.close();
     
     // Check if this is the next chunk we're expecting
     if (sequence == transfer.next_sequential_chunk) {
