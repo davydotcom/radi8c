@@ -1233,10 +1233,24 @@ void TUI::refresh_file_picker_entries() {
     file_picker_selected_index = 0;
     file_picker_scroll_offset = 0;
     
-    // Always add parent directory option
+#ifdef _WIN32
+    // On Windows, show drives when path is empty or invalid
+    if (file_picker_path.empty() || file_picker_path == "<drives>") {
+        file_picker_path = "<drives>";
+        // List available drives
+        DWORD drives = GetLogicalDrives();
+        for (int i = 0; i < 26; i++) {
+            if (drives & (1 << i)) {
+                char drive[4] = {char('A' + i), ':', '\\', '\0'};
+                file_picker_entries.push_back(std::string(drive) + "/");
+            }
+        }
+        return;
+    }
+    
+    // Always add parent directory option (unless at drives list)
     file_picker_entries.push_back("..");
     
-#ifdef _WIN32
     // Windows directory enumeration
     std::string search_path = file_picker_path + "\\*";
     WIN32_FIND_DATAA find_data;
@@ -1418,20 +1432,61 @@ std::string TUI::pick_file() {
                 
                 if (selected == "..") {
                     // Go to parent directory
+#ifdef _WIN32
+                    if (file_picker_path == "<drives>") {
+                        // Already at drives list, stay there
+                    } else {
+                        size_t last_slash = file_picker_path.find_last_of("\\/");
+                        if (last_slash != std::string::npos) {
+                            // Check if we're at drive root (e.g., "C:\")
+                            if (last_slash == 2 && file_picker_path[1] == ':') {
+                                // Go back to drives list
+                                file_picker_path = "<drives>";
+                            } else if (last_slash > 0) {
+                                file_picker_path = file_picker_path.substr(0, last_slash);
+                                // Ensure we keep drive root format if we're at it
+                                if (file_picker_path.length() == 2 && file_picker_path[1] == ':') {
+                                    file_picker_path += "\\";
+                                }
+                            }
+                        }
+                    }
+#else
                     size_t last_slash = file_picker_path.find_last_of('/');
                     if (last_slash != std::string::npos && last_slash > 0) {
                         file_picker_path = file_picker_path.substr(0, last_slash);
                     } else {
                         file_picker_path = "/";
                     }
+#endif
                     refresh_file_picker_entries();
                 } else if (selected.back() == '/') {
                     // Enter directory
+#ifdef _WIN32
+                    std::string dir_name = selected.substr(0, selected.length() - 1);
+                    if (file_picker_path == "<drives>") {
+                        // Selecting a drive (e.g., "C:\\")
+                        file_picker_path = dir_name;
+                    } else if (file_picker_path.back() == '\\') {
+                        file_picker_path += dir_name;
+                    } else {
+                        file_picker_path += "\\" + dir_name;
+                    }
+#else
                     file_picker_path += "/" + selected.substr(0, selected.length() - 1);
+#endif
                     refresh_file_picker_entries();
                 } else {
                     // Selected a file
+#ifdef _WIN32
+                    if (file_picker_path.back() == '\\') {
+                        file_picker_selected_file = file_picker_path + selected;
+                    } else {
+                        file_picker_selected_file = file_picker_path + "\\" + selected;
+                    }
+#else
                     file_picker_selected_file = file_picker_path + "/" + selected;
+#endif
                     show_file_picker_modal = false;
                     screen.Exit();
                 }
