@@ -6,6 +6,7 @@
 #include <vector>
 #include <mutex>
 #include <functional>
+#include <chrono>
 
 // Forward declaration
 class Protocol;
@@ -24,6 +25,7 @@ struct OutgoingFileTransfer {
     size_t file_size;
     int total_chunks;
     int chunks_sent;
+    std::chrono::steady_clock::time_point last_status_update;
 };
 
 struct IncomingFileTransfer {
@@ -38,6 +40,9 @@ struct IncomingFileTransfer {
     int chunks_received;  // Total count of unique chunks received
     int total_chunks;  // -1 until we receive the final marker
     bool completed;
+    std::chrono::steady_clock::time_point last_status_update;
+    std::chrono::steady_clock::time_point finalization_requested_time;  // When finalization was first requested
+    bool finalization_pending;  // True if waiting for missing chunks
 };
 
 class FileTransferManager {
@@ -71,8 +76,9 @@ public:
     // Finalize a file transfer
     void finalize_transfer(const std::string& sender, int fd, int total_chunks);
     
-    // Background sending (call periodically or in thread)
+    // Background sending and finalization (call periodically or in thread)
     void process_outgoing_transfers();
+    void process_pending_finalizations();
 };
 
 #endif

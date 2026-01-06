@@ -2,6 +2,7 @@
 #define CONNECTION_H
 
 #include <string>
+#include <mutex>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
@@ -14,6 +15,7 @@ private:
     bool connected;
     std::string hostname;
     int port;
+    std::mutex send_mutex;  // Protect concurrent sends
 
 public:
     Connection();

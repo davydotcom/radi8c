@@ -860,8 +860,13 @@ Component TUI::build_ui() {
         auto center = center_inner | vscroll_indicator | focusPositionRelative(0.0f, chat_scroll_y) | frame | reflect(chat_box) | border | flex;
         auto right = render_user_list() | size(WIDTH, EQUAL, 22);
         
-        // Build status row
-        auto status = hbox({ text(status_text) | inverted | flex });
+        // Build status row (read status_text with mutex)
+        std::string current_status;
+        {
+            std::lock_guard<std::mutex> lock(status_mutex);
+            current_status = status_text;
+        }
+        auto status = hbox({ text(current_status) | inverted | flex });
         
         // Visual preview: wrapped paragraph of the input content with cursor when focused
         Element input_visual;
@@ -1079,6 +1084,17 @@ Component TUI::build_ui() {
     });
     
     return component_with_keys;
+}
+
+void TUI::set_status(const std::string& status) {
+    std::lock_guard<std::mutex> lock(status_mutex);
+    status_text = status;
+}
+
+void TUI::set_status_and_render(const std::string& status) {
+    std::lock_guard<std::mutex> lock(status_mutex);
+    status_text = status;
+    screen.Post(Event::Custom);
 }
 
 void TUI::render() {

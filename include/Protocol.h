@@ -68,6 +68,7 @@ private:
     void handle_motd(const std::vector<std::string>& parts);
     void handle_approval(const std::vector<std::string>& parts);
     void handle_die(const std::vector<std::string>& parts);
+    void handle_ping(const std::vector<std::string>& parts);
 };
 
 #endif

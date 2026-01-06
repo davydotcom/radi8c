@@ -167,6 +167,7 @@ bool Protocol::unban_user(const std::string& user) {
 void Protocol::process_file_transfers() {
     if (file_transfer_mgr) {
         file_transfer_mgr->process_outgoing_transfers();
+        file_transfer_mgr->process_pending_finalizations();
     }
 }
 
@@ -204,6 +205,8 @@ void Protocol::process_server_message(const std::string& message) {
         handle_approval(parts);
     } else if (cmd == "!die") {
         handle_die(parts);
+    } else if (cmd == "!ping") {
+        handle_ping(parts);
     }
 }
 
@@ -569,4 +572,9 @@ void Protocol::handle_die(const std::vector<std::string>& parts) {
 
     // Remove the channel from the list
     tui->remove_channel(channel);
+}
+
+void Protocol::handle_ping(const std::vector<std::string>& parts) {
+    // !ping received from server - respond with !pong
+    conn->send_message("!pong");
 }

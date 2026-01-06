@@ -7,6 +7,7 @@
 #include <memory>
 #include <functional>
 #include <unordered_set>
+#include <mutex>
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 
@@ -88,6 +89,9 @@ private:
     // Last received download path
     std::string last_download_path;
     
+    // Mutex for thread-safe status updates
+    mutable std::mutex status_mutex;
+    
 public:
     TUI();
     ~TUI();
@@ -108,7 +112,8 @@ public:
     void remove_user_from_channel(const std::string& channel, const std::string& username);
     void update_topic(const std::string& channel, const std::string& topic);
     void set_username(const std::string& username) { current_username = username; }
-    void set_status(const std::string& status) { status_text = status; }
+    void set_status(const std::string& status);
+    void set_status_and_render(const std::string& status);
     
     // Clear messages for a given channel/DM; if name empty, no-op.
     void clear_channel_messages(const std::string& name);

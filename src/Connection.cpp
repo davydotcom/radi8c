@@ -141,6 +141,8 @@ bool Connection::connect_to_server(const std::string& host, int p, bool use_ssl_
 }
 
 bool Connection::send_message(const std::string& message) {
+    std::lock_guard<std::mutex> lock(send_mutex);
+    
     if (!connected || sockfd < 0) {
         return false;
     }
