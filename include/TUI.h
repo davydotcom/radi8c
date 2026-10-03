@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <deque>
 #include <memory>
 #include <functional>
 #include <unordered_set>
@@ -81,6 +82,7 @@ private:
     std::function<void(const std::string&)> on_input_callback;
     std::function<void(const std::string& name, const std::string& password, bool is_dm)> on_join_request;
     bool should_exit;
+    bool main_loop_active = false;
 
     // Private text reveal state
     int next_msg_id = 1;
@@ -91,6 +93,9 @@ private:
     
     // Mutex for thread-safe status updates
     mutable std::mutex status_mutex;
+    
+    std::mutex pending_mutex;
+    std::deque<std::function<void()>> pending_tasks;
     
 public:
     TUI();
@@ -126,6 +131,13 @@ public:
     std::string pick_file();  // Open file picker dialog, returns path or empty string if cancelled
     
     void render();
+    
+    // All TUI state is owned by the UI thread. Background threads must use
+    // post() to queue work; it runs on the next UI event via run_pending().
+    void post(std::function<void()> task);
+    void run_pending();
+    void discard_pending();
+    
     std::string get_active_channel() const { return active_channel; }
     std::string get_first_active_channel() const;
     bool is_active_channel_dm() const {

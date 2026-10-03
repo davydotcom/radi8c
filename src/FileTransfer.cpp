@@ -42,6 +42,26 @@ static std::string format_file_size(size_t bytes) {
     return oss.str();
 }
 
+// Incoming filenames are remote-controlled: reduce to a bare name so they
+// can't escape the download directory.
+static std::string sanitize_filename(const std::string& name) {
+    std::string base = name;
+    size_t last_sep = base.find_last_of("/\\");
+    if (last_sep != std::string::npos) {
+        base = base.substr(last_sep + 1);
+    }
+    std::string out;
+    for (unsigned char c : base) {
+        if (c >= 0x20 && c != 0x7f && c != ':') {
+            out += static_cast<char>(c);
+        }
+    }
+    if (out.empty() || out == "." || out == "..") {
+        out = "download";
+    }
+    return out;
+}
+
 // Base64 encoding table
 static const std::string base64_chars = 
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -327,8 +347,13 @@ void FileTransferManager::process_outgoing_transfers() {
         tui->set_status_and_render(progress);
     }
     
-    for (const auto& msg : messages_to_add) {
-        tui->add_message(msg);
+    if (!messages_to_add.empty()) {
+        TUI* ui = tui;
+        ui->post([ui, messages_to_add]() {
+            for (const auto& msg : messages_to_add) {
+                ui->add_message(msg);
+            }
+        });
     }
     
     if (should_clear_status) {
@@ -357,7 +382,7 @@ void FileTransferManager::receive_chunk(const std::string& sender, int fd, int s
             // New transfer - create .part file
             transfer.fd = fd;
             transfer.sender = sender;
-            transfer.filename = filename;
+            transfer.filename = sanitize_filename(filename);
             transfer.file_size = file_size;
             transfer.bytes_received = 0;
             transfer.total_chunks = -1;
@@ -368,12 +393,12 @@ void FileTransferManager::receive_chunk(const std::string& sender, int fd, int s
             transfer.finalization_pending = false;
             
             // Create temp file path
-            transfer.temp_filepath = get_download_dir() + "/" + filename + ".part";
+            transfer.temp_filepath = get_download_dir() + "/" + transfer.filename + ".part";
             
             // Handle temp file conflicts
             int counter = 1;
             while (access(transfer.temp_filepath.c_str(), F_OK) == 0) {
-                transfer.temp_filepath = get_download_dir() + "/" + filename + ".part." + std::to_string(counter++);
+                transfer.temp_filepath = get_download_dir() + "/" + transfer.filename + ".part." + std::to_string(counter++);
             }
             
             // Create empty part file
@@ -391,9 +416,9 @@ void FileTransferManager::receive_chunk(const std::string& sender, int fd, int s
             new_transfer_msg.channel = active_channel;
             new_transfer_msg.username = "SYSTEM";
             if (file_size > 0) {
-                new_transfer_msg.message = "Receiving File: " + filename + " (" + format_file_size(file_size) + ") from " + sender;
+                new_transfer_msg.message = "Receiving File: " + transfer.filename + " (" + format_file_size(file_size) + ") from " + sender;
             } else {
-                new_transfer_msg.message = "Receiving File: " + filename + " from " + sender;
+                new_transfer_msg.message = "Receiving File: " + transfer.filename + " from " + sender;
             }
             new_transfer_msg.timestamp = oss.str();
             new_transfer_msg.is_emote = false;
@@ -483,25 +508,12 @@ void FileTransferManager::finalize_transfer(const std::string& sender, int fd, i
         IncomingFileTransfer& transfer = transfer_it->second;
         transfer.total_chunks = total_chunks;
         
-        // DEBUG: Log finalization to file
-        std::ofstream debug_log("/tmp/radi8_debug.log", std::ios::app);
-        debug_log << "[DEBUG] Finalizing transfer: " << transfer.filename 
-                  << ", received=" << transfer.chunks_received 
-                  << ", total=" << total_chunks 
-                  << ", pending=" << transfer.pending_chunks.size() << std::endl;
-        debug_log.close();
-        
         // Verify we received all expected chunks
         if (transfer.chunks_received != total_chunks) {
             // If this is the first time we're noticing missing chunks, mark as pending and wait
             if (!transfer.finalization_pending) {
                 transfer.finalization_pending = true;
                 transfer.finalization_requested_time = std::chrono::steady_clock::now();
-                
-                std::ofstream debug_log2("/tmp/radi8_debug.log", std::ios::app);
-                debug_log2 << "[DEBUG] Deferring finalization for " << transfer.filename 
-                          << ", waiting for " << (total_chunks - transfer.chunks_received) << " missing chunks" << std::endl;
-                debug_log2.close();
                 
                 // Don't finalize yet - let process_pending_finalizations() handle it
                 return;
@@ -577,9 +589,7 @@ void FileTransferManager::finalize_transfer(const std::string& sender, int fd, i
 }
 
 void FileTransferManager::process_pending_finalizations() {
-    // Get active channel before acquiring any locks to avoid deadlock
-    std::string active_channel = tui->get_active_channel();
-    
+    // Runs on the file transfer thread: messages get their channel assigned on the UI thread.
     // Collect UI updates to perform outside the lock
     std::vector<ChatMessage> messages_to_add;
     std::vector<std::string> downloads_to_track;
@@ -602,12 +612,6 @@ void FileTransferManager::process_pending_finalizations() {
                 
                 // Check if all chunks have arrived
                 if (transfer.chunks_received == transfer.total_chunks) {
-                    // Success! All chunks arrived. Complete the transfer.
-                    std::ofstream debug_log("/tmp/radi8_debug.log", std::ios::app);
-                    debug_log << "[DEBUG] All chunks arrived for " << transfer.filename 
-                             << ", completing transfer" << std::endl;
-                    debug_log.close();
-                    
                     transfer.finalization_pending = false;
                     
                     // Determine final output path
@@ -634,7 +638,6 @@ void FileTransferManager::process_pending_finalizations() {
                             << ":" << std::setfill('0') << std::setw(2) << local_time->tm_min << "]";
                         
                         ChatMessage msg;
-                        msg.channel = active_channel;
                         msg.username = "SYSTEM";
                         msg.message = "Receive Completed: " + transfer.filename + " -> " + output_path;
                         msg.open_path = output_path;
@@ -649,7 +652,6 @@ void FileTransferManager::process_pending_finalizations() {
                     } else {
                         // Prepare error message
                         ChatMessage msg;
-                        msg.channel = active_channel;
                         msg.username = "ERROR";
                         msg.message = "Failed to save file: " + transfer.filename;
                         msg.timestamp = "";
@@ -666,14 +668,7 @@ void FileTransferManager::process_pending_finalizations() {
                     now - transfer.finalization_requested_time).count();
                 
                 if (elapsed >= GRACE_PERIOD_SECONDS) {
-                    // Grace period expired - fail the transfer
-                    std::ofstream debug_log("/tmp/radi8_debug.log", std::ios::app);
-                    debug_log << "[DEBUG] Grace period expired for " << transfer.filename 
-                             << ", still missing " << (transfer.total_chunks - transfer.chunks_received) << " chunks" << std::endl;
-                    debug_log.close();
-                    
                     ChatMessage msg;
-                    msg.channel = active_channel;
                     msg.username = "ERROR";
                     msg.message = "File transfer incomplete: " + transfer.filename + 
                                  " (received " + std::to_string(transfer.chunks_received) + 
@@ -705,12 +700,17 @@ void FileTransferManager::process_pending_finalizations() {
     // Mutex is now released - safe to call UI functions
     
     // Process all UI updates outside the lock
-    for (const auto& msg : messages_to_add) {
-        tui->add_message(msg);
-    }
-    
-    for (const auto& path : downloads_to_track) {
-        tui->set_last_download(path);
+    if (!messages_to_add.empty() || !downloads_to_track.empty()) {
+        TUI* ui = tui;
+        ui->post([ui, messages_to_add, downloads_to_track]() mutable {
+            for (auto& msg : messages_to_add) {
+                msg.channel = ui->get_active_channel();
+                ui->add_message(msg);
+            }
+            for (const auto& path : downloads_to_track) {
+                ui->set_last_download(path);
+            }
+        });
     }
     
     if (should_clear_status) {

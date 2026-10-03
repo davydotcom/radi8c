@@ -5,6 +5,7 @@
 #include <vector>
 #include <functional>
 #include <memory>
+#include <atomic>
 #include "Connection.h"
 #include "TUI.h"
 #include "FileTransfer.h"
@@ -14,10 +15,11 @@ private:
     Connection* conn;
     TUI* tui;
     std::string username;
-    bool authenticated;
-    bool auth_error;  // Set when authentication error received
-    bool auth_approved;  // Set when !apr:name received
+    std::atomic<bool> authenticated;
+    std::atomic<bool> auth_error;  // Set when authentication error received
+    std::atomic<bool> auth_approved;  // Set when !apr:name received
     std::string motd_accumulator;  // Accumulate MOTD chunks
+    bool motd_chunked = false;     // Server sends MOTD as <nl>-escaped chunks
     std::unique_ptr<FileTransferManager> file_transfer_mgr;
     
 public:

@@ -383,13 +383,6 @@ void Protocol::handle_channel_add(const std::vector<std::string>& parts) {
     std::string channel = parts[1];
     std::string topic = (parts.size() >= 4) ? parts[3] : "";
     
-    // DEBUG: Log all received chanadd commands to file
-    std::ofstream logfile("/tmp/radi8c2_chanadd.log", std::ios::app);
-    if (logfile.is_open()) {
-        logfile << "[DEBUG] Received !chanadd: channel=" << channel << ", topic=" << topic << ", parts.size=" << parts.size() << std::endl;
-        logfile.close();
-    }
-    
     // Add as unjoined, browsable channel
     tui->add_channel(channel, topic, false, false);
 }
@@ -477,11 +470,20 @@ void Protocol::handle_motd(const std::vector<std::string>& parts) {
         motd_raw += parts[i];
     }
     
+    // radi8d splits the MOTD into fixed-size chunks with <nl> escapes; other
+    // servers (e.g. MarsMUD) send one complete line per !motd message.
+    if (motd_raw.find("<nl>") != std::string::npos) {
+        motd_chunked = true;
+    }
+    
     // Unescape the MOTD content (it may have <colon> and <nl> escapes)
     std::string motd_chunk = unescape_from_wire(motd_raw);
     
     // Accumulate the chunk
     motd_accumulator += motd_chunk;
+    if (!motd_chunked) {
+        motd_accumulator += '\n';
+    }
     
     // Check if we have complete lines to display (look for newlines)
     size_t pos = 0;

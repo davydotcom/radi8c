@@ -31,12 +31,6 @@ void receive_thread(Connection* conn, Protocol* proto, TUI* tui, std::atomic<boo
     std::string line_buffer;  // Buffer for incomplete lines
     
     while (running && conn->is_connected()) {
-        
-        // Check connection before attempting receive to avoid issues during disconnect
-        if (!conn->is_connected()) {
-            break;
-        }
-        
         std::string message = conn->receive_message(100);
         
         if (!message.empty()) {
@@ -57,8 +51,7 @@ void receive_thread(Connection* conn, Protocol* proto, TUI* tui, std::atomic<boo
                         line.pop_back();
                     }
                     if (!line.empty() && line[0] == '!') {
-                        proto->process_server_message(line);
-                        tui->render();
+                        tui->post([proto, line]() { proto->process_server_message(line); });
                     }
                     start = pos + 1;
                 }
@@ -75,13 +68,17 @@ void receive_thread(Connection* conn, Protocol* proto, TUI* tui, std::atomic<boo
     // If we exited because connection was lost (not user quitting), signal it
     if (running && !conn->is_connected()) {
         *connection_lost = true;
-        tui->exit_loop();  // Exit the UI loop
+        tui->post([tui]() { tui->exit_loop(); });
     }
 }
 
 int main(int, char**) {
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
+#ifndef _WIN32
+    // Writes to a closed socket must fail with EPIPE instead of killing the process.
+    signal(SIGPIPE, SIG_IGN);
+#endif
     
     TUI tui;
     Connection conn;
@@ -117,6 +114,21 @@ int main(int, char**) {
             username = last_conn.username;
             password = "";
             
+            // Order matters: wake I/O threads, join them, drop queued work that
+            // references proto, then free proto and the connection.
+            auto stop_session = [&]() {
+                conn.interrupt();
+                if (recv_thread) {
+                    if (recv_thread->joinable()) recv_thread->join();
+                    delete recv_thread;
+                    recv_thread = nullptr;
+                }
+                tui.discard_pending();
+                delete proto;
+                proto = nullptr;
+                conn.disconnect();
+            };
+            
             while (!authenticated) {
             if (!tui.show_login_dialog(host, port, use_ssl, username, password)) {
                 std::cout << "Login cancelled." << std::endl;
@@ -127,7 +139,7 @@ int main(int, char**) {
             
             // Connect to server
             if (!conn.connect_to_server(host, port, use_ssl)) {
-                tui.show_error("Failed to connect to server. Please try again.");
+                tui.show_error("Failed to connect: " + conn.get_last_error());
                 conn.disconnect();
                 continue;
             }
@@ -137,52 +149,36 @@ int main(int, char**) {
             proto->clear_auth_error();
             proto->clear_auth_approved();
             
+            connection_lost = false;
             recv_thread = new std::thread(receive_thread, &conn, proto, &tui, &connection_lost);
             
             // Send authentication request
             tui.set_status("Authenticating as " + username + "...");
             if (!proto->authenticate(username, password)) {
+                stop_session();
                 tui.show_error("Failed to send authentication. Please try again.");
-                running = false;
-                recv_thread->join();
-                running = true;
-                delete recv_thread;
-                delete proto;
-                proto = nullptr;
-                recv_thread = nullptr;
-                conn.disconnect();
                 continue;
             }
             
-            // Wait for authentication response (max 30 seconds for SSL handshake/network latency)
+            // Wait for authentication response (max 30 seconds for SSL handshake/network latency).
+            // No UI loop is running yet, so drain server messages on this thread.
             int wait_ms = 0;
-            while (wait_ms < 30000 && !proto->is_auth_approved() && !proto->has_auth_error()) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                wait_ms += 100;
+            while (wait_ms < 30000 && !proto->is_auth_approved() && !proto->has_auth_error() && conn.is_connected()) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                tui.run_pending();
+                wait_ms += 50;
             }
             
             // Check result
             if (proto->has_auth_error()) {
+                stop_session();
                 tui.show_error("Authentication failed. Invalid username or password.");
-                conn.disconnect();  // Disconnect first to unblock receive thread
-                running = false;  // Stop receive thread
-                recv_thread->join();
-                running = true;   // Reset for next attempt
-                delete recv_thread;
-                delete proto;
-                proto = nullptr;
-                recv_thread = nullptr;
                 continue;
             } else if (!proto->is_auth_approved()) {
-                tui.show_error("Authentication timeout. Please try again.");
-                conn.disconnect();  // Disconnect first to unblock receive thread
-                running = false;  // Stop receive thread
-                recv_thread->join();
-                running = true;   // Reset for next attempt
-                delete recv_thread;
-                delete proto;
-                proto = nullptr;
-                recv_thread = nullptr;
+                bool dropped = !conn.is_connected();
+                stop_session();
+                tui.show_error(dropped ? "Server closed the connection during login."
+                                       : "Authentication timeout. Please try again.");
                 continue;
             }
             
@@ -393,11 +389,11 @@ int main(int, char**) {
                     // Tear down connection and return to login prompt without error
                     user_requested_disconnect = true;
                     running = false;
-                    conn.disconnect();
+                    conn.interrupt();
                     tui.exit_loop();
                 } else if (cmd == "quit" || cmd == "exit" || cmd == "q") {
                     running = false;
-                    conn.disconnect();
+                    conn.interrupt();
                     tui.exit_loop();
                 } else if (cmd == "kick") {
                     // /kick <user> [reason] - uses active channel
@@ -561,19 +557,12 @@ int main(int, char**) {
             config.set_joined_channels(host, joined_channels);
             config.save();
             
-            // Cleanup threads — disconnect first to wake any blocking reads
             running = false;
-            conn.disconnect();
-            if (recv_thread && recv_thread->joinable()) {
-                recv_thread->join();
-            }
+            conn.interrupt();
             if (file_transfer_thread.joinable()) {
                 file_transfer_thread.join();
             }
-            delete recv_thread;
-            delete proto;
-            recv_thread = nullptr;
-            proto = nullptr;
+            stop_session();
             
             // Decide reconnection behavior
             if (connection_lost) {

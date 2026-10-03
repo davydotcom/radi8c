@@ -6,6 +6,7 @@
 #include <sstream>
 #include <climits>
 #include <cstdio>
+#include <thread>
 
 #ifdef _WIN32
     #define NOMINMAX
@@ -19,7 +20,11 @@
 #else
     #include <unistd.h>
     #include <dirent.h>
+    #include <fcntl.h>
+    #include <spawn.h>
     #include <sys/stat.h>
+    #include <sys/wait.h>
+    extern char** environ;
 #endif
 
 using namespace ftxui;
@@ -39,12 +44,25 @@ void TUI::open_file(const std::string& path) {
 #ifdef _WIN32
     // Use Windows API to open file with default application
     ShellExecuteA(NULL, "open", path.c_str(), NULL, NULL, SW_SHOWNORMAL);
-#elif defined(__APPLE__) || defined(__MACH__)
-    std::string cmd = std::string("open ") + '"' + path + '"';
-    std::system(cmd.c_str());
 #else
-    std::string cmd = std::string("xdg-open ") + '"' + path + '"';
-    std::system(cmd.c_str());
+    // Never go through a shell here: the path may contain a remote-supplied filename.
+#if defined(__APPLE__) || defined(__MACH__)
+    const char* opener = "open";
+#else
+    const char* opener = "xdg-open";
+#endif
+    posix_spawn_file_actions_t actions;
+    posix_spawn_file_actions_init(&actions);
+    posix_spawn_file_actions_addopen(&actions, STDIN_FILENO, "/dev/null", O_RDONLY, 0);
+    posix_spawn_file_actions_addopen(&actions, STDOUT_FILENO, "/dev/null", O_WRONLY, 0);
+    posix_spawn_file_actions_addopen(&actions, STDERR_FILENO, "/dev/null", O_WRONLY, 0);
+    
+    std::vector<char*> argv = { const_cast<char*>(opener), const_cast<char*>(path.c_str()), nullptr };
+    pid_t pid;
+    if (posix_spawnp(&pid, opener, &actions, nullptr, argv.data(), environ) == 0) {
+        std::thread([pid]() { waitpid(pid, nullptr, 0); }).detach();
+    }
+    posix_spawn_file_actions_destroy(&actions);
 #endif
 }
 
@@ -64,12 +82,18 @@ void TUI::cleanup() {
 }
 
 void TUI::run() {
+    run_pending();
+    main_loop_active = true;
     screen.Loop(main_component);
+    main_loop_active = false;
 }
 
 void TUI::exit_loop() {
     should_exit = true;
-    screen.Exit();
+    // Exit() queues a quit that would otherwise close whichever loop runs next.
+    if (main_loop_active) {
+        screen.Exit();
+    }
 }
 
 void TUI::add_channel(const std::string& name, const std::string& topic, bool is_dm, bool joined) {
@@ -483,7 +507,7 @@ Element TUI::format_message(const ChatMessage& msg) {
             };
             
             for (const auto& line : wrapped) {
-                auto btn = Button(line, [this, &msg](){ open_file(msg.open_path); }, opt);
+                auto btn = Button(line, [this, path = msg.open_path](){ open_file(path); }, opt);
                 if (message_controls) message_controls->Add(btn);
                 lines.push_back(btn->Render());
             }
@@ -538,9 +562,9 @@ Element TUI::format_message(const ChatMessage& msg) {
                 // Create a button to reveal this message's private content (toggle all of them)
                 ButtonOption opt = ButtonOption::Simple();
                 opt.transform = [](const EntryState& s){ auto e = text(s.label) | underlined; if (s.focused) e = e | inverted; return e; };
-                auto btn = Button(mask, [this, &msg]() {
+                auto btn = Button(mask, [this, id = msg.id]() {
                     // Toggle reveal for this message id
-                    if (revealed_private_ids.count(msg.id)) revealed_private_ids.erase(msg.id); else revealed_private_ids.insert(msg.id);
+                    if (revealed_private_ids.count(id)) revealed_private_ids.erase(id); else revealed_private_ids.insert(id);
                     render();
                 }, opt);
                 if (message_controls) message_controls->Add(btn);
@@ -579,7 +603,7 @@ Element TUI::format_message(const ChatMessage& msg) {
             };
             
             for (const auto& line : wrapped) {
-                auto btn = Button(line, [this, &msg](){ open_file(msg.open_path); }, opt);
+                auto btn = Button(line, [this, path = msg.open_path](){ open_file(path); }, opt);
                 if (message_controls) message_controls->Add(btn);
                 lines.push_back(btn->Render());
             }
@@ -928,6 +952,18 @@ Component TUI::build_ui() {
     
     // Catch quit, navigation, and chat scroll events
     auto component_with_keys = CatchEvent(renderer, [this](Event event) {
+        if (event == Event::Custom) {
+            run_pending();
+            return false;
+        }
+        
+        if (show_join_modal && event == Event::Escape) {
+            show_join_modal = false;
+            join_target_input.clear();
+            join_password_input.clear();
+            return true;
+        }
+        
         if (event == Event::Escape || event == Event::CtrlC) {
             exit_loop();
             return true;
@@ -1101,11 +1137,38 @@ void TUI::render() {
     screen.Post(Event::Custom);
 }
 
+void TUI::post(std::function<void()> task) {
+    {
+        std::lock_guard<std::mutex> lock(pending_mutex);
+        pending_tasks.push_back(std::move(task));
+    }
+    screen.Post(Event::Custom);
+}
+
+void TUI::run_pending() {
+    std::deque<std::function<void()>> tasks;
+    {
+        std::lock_guard<std::mutex> lock(pending_mutex);
+        tasks.swap(pending_tasks);
+    }
+    for (auto& task : tasks) {
+        try {
+            task();
+        } catch (const std::exception& e) {
+            set_status(std::string("Error handling server message: ") + e.what());
+        }
+    }
+}
+
+void TUI::discard_pending() {
+    std::lock_guard<std::mutex> lock(pending_mutex);
+    pending_tasks.clear();
+}
+
 bool TUI::show_login_dialog(std::string& host, int& port, bool& use_ssl,
                             std::string& username, std::string& password) {
     std::string port_str = std::to_string(port);
-    int ssl_selected = use_ssl ? 0 : 1;
-    std::vector<std::string> ssl_options = {"Yes", "No"};
+    bool ssl_checked = use_ssl;
     
     bool submitted = false;
     bool cancelled = false;
@@ -1119,8 +1182,8 @@ bool TUI::show_login_dialog(std::string& host, int& port, bool& use_ssl,
     port_option.multiline = false;
     auto port_input = Input(&port_str, "1337", port_option);
     
-    // SSL dropdown
-    auto ssl_dropdown = Radiobox(&ssl_options, &ssl_selected);
+    // Checkbox rather than Radiobox: Radiobox swallows Tab, trapping focus.
+    auto ssl_checkbox = Checkbox("Use SSL/TLS (Space to toggle)", &ssl_checked);
     
     InputOption user_option;
     user_option.multiline = false;
@@ -1134,7 +1197,7 @@ bool TUI::show_login_dialog(std::string& host, int& port, bool& use_ssl,
     auto container = Container::Vertical({
         host_input,
         port_input,
-        ssl_dropdown,
+        ssl_checkbox,
         user_input,
         pass_input,
     });
@@ -1150,11 +1213,11 @@ bool TUI::show_login_dialog(std::string& host, int& port, bool& use_ssl,
             separator(),
             hbox({text("Host:     "), host_input->Render() | flex}),
             hbox({text("Port:     "), port_input->Render() | flex}),
-            hbox({text("SSL:      "), ssl_dropdown->Render()}),
+            hbox({text("SSL:      "), ssl_checkbox->Render()}),
             hbox({text("Username: "), user_input->Render() | flex}),
             hbox({text("Password: "), pass_input->Render() | flex}),
             separator(),
-            text("[Enter] Connect  [Esc] Quit") | dim | center,
+            text("[Tab] Next field  [Enter] Connect  [Esc] Quit") | dim | center,
         }) | border | size(WIDTH, EQUAL, 60) | center;
     });
     
@@ -1187,7 +1250,7 @@ bool TUI::show_login_dialog(std::string& host, int& port, bool& use_ssl,
         } catch (...) {
             port = 1337;
         }
-        use_ssl = (ssl_selected == 0); // 0 = Yes, 1 = No
+        use_ssl = ssl_checked;
         return true;
     }
     
